@@ -1,69 +1,91 @@
-import Image from "next/image";
-
 export default function Home() {
+  const servicios = [
+    {
+      nombre: "Peluquería",
+      descripcion: "Cortes, coloración y tratamientos capilares.",
+    },
+    {
+      nombre: "Manicura y Pedicura",
+      descripcion: "Cuidado completo de manos y pies.",
+    },
+    {
+      nombre: "Tratamientos Faciales",
+      descripcion: "Higienes faciales y cuidados personalizados.",
+    },
+    {
+      nombre: "Diseño de Mirada",
+      descripcion: "Cejas, pestañas y micropigmentación.",
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-white text-neutral-900">
+      {/* Cabecera */}
+      <header className="flex items-center justify-between px-8 py-6 border-b border-neutral-100">
+        <h1 className="text-xl font-light tracking-widest uppercase">
+          Laksmir Beauty Salon
+        </h1>
+        <nav className="hidden md:flex gap-8 text-sm uppercase tracking-wide text-neutral-600">
+          <a href="#servicios" className="hover:text-neutral-900">Servicios</a>
+          <a href="#reservas" className="hover:text-neutral-900">Reservas</a>
+          <a href="#contacto" className="hover:text-neutral-900">Contacto</a>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <section className="flex flex-col items-center justify-center text-center px-6 py-32">
+        <p className="text-sm uppercase tracking-[0.3em] text-neutral-400 mb-4">
+          Belleza y bienestar
+        </p>
+        <h2 className="text-4xl md:text-6xl font-light mb-6 max-w-2xl">
+          Permítete brillar
+        </h2>
+        <p className="text-neutral-500 max-w-md mb-10">
+          Peluquería y estética profesional. Reserva tu cita y déjate cuidar.
+        </p>
+        
+          <a href="#reservas"
+          className="border border-neutral-900 px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-900 hover:text-white transition-colors"
+        >
+          Reservar cita
+        </a>
+      </section>
+
+      {/* Servicios */}
+      <section id="servicios" className="px-8 py-24 bg-neutral-50">
+        <h3 className="text-center text-sm uppercase tracking-[0.3em] text-neutral-400 mb-16">
+          Nuestros servicios
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-5xl mx-auto">
+          {servicios.map((servicio) => (
+            <div key={servicio.nombre} className="text-center">
+              <h4 className="text-lg font-light mb-3">{servicio.nombre}</h4>
+              <p className="text-sm text-neutral-500">{servicio.descripcion}</p>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Reservas */}
+      <section id="reservas" className="px-8 py-24 text-center">
+        <h3 className="text-3xl font-light mb-6">Reserva tu cita</h3>
+        <p className="text-neutral-500 max-w-md mx-auto mb-10">
+          Elige el servicio y el horario que mejor te convenga.
+        </p>
+        
+          <a href="#"
+          className="inline-block bg-neutral-900 text-white px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-700 transition-colors"
+        >
+          Ver disponibilidad
+        </a>
+      </section>
+
+      {/* Contacto / Footer */}
+      <footer id="contacto" className="px-8 py-16 border-t border-neutral-100 text-center text-sm text-neutral-500">
+        <p className="mb-2">Ripagaina, Pamplona</p>
+        <p className="mb-2">laksmirbeauty@gmail.com</p>
+        <p>© 2026 Laksmir Beauty Salon</p>
+      </footer>
+    </main>
   );
 }
