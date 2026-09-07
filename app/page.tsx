@@ -1,22 +1,23 @@
-export default function Home() {
-  const servicios = [
-    {
-      nombre: "Peluquería",
-      descripcion: "Cortes, coloración y tratamientos capilares.",
-    },
-    {
-      nombre: "Manicura y Pedicura",
-      descripcion: "Cuidado completo de manos y pies.",
-    },
-    {
-      nombre: "Tratamientos Faciales",
-      descripcion: "Higienes faciales y cuidados personalizados.",
-    },
-    {
-      nombre: "Diseño de Mirada",
-      descripcion: "Cejas, pestañas y micropigmentación.",
-    },
-  ];
+import { supabase } from "../lib/supabase";
+
+// Esta función se ejecuta en el servidor antes de mostrar la página,
+// y trae los servicios directamente desde la base de datos de Supabase
+async function getServicios() {
+  const { data, error } = await supabase
+    .from("servicios")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Error al traer los servicios:", error);
+    return [];
+  }
+
+  return data;
+}
+
+export default async function Home() {
+  const servicios = await getServicios();
 
   return (
     <main className="min-h-screen bg-white text-neutral-900">
@@ -51,14 +52,14 @@ export default function Home() {
         </a>
       </section>
 
-      {/* Servicios */}
+      {/* Servicios — ahora vienen de Supabase */}
       <section id="servicios" className="px-8 py-24 bg-neutral-50">
         <h3 className="text-center text-sm uppercase tracking-[0.3em] text-neutral-400 mb-16">
           Nuestros servicios
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
           {servicios.map((servicio) => (
-            <div key={servicio.nombre} className="text-center">
+            <div key={servicio.id} className="text-center">
               <h4 className="text-lg font-light mb-3">{servicio.nombre}</h4>
               <p className="text-sm text-neutral-500">{servicio.descripcion}</p>
             </div>
@@ -73,7 +74,7 @@ export default function Home() {
           Elige el servicio y el horario que mejor te convenga.
         </p>
         
-          <a href="#"
+        <a href="#"
           className="inline-block bg-neutral-900 text-white px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-700 transition-colors"
         >
           Ver disponibilidad
@@ -82,9 +83,9 @@ export default function Home() {
 
       {/* Contacto / Footer */}
       <footer id="contacto" className="px-8 py-16 border-t border-neutral-100 text-center text-sm text-neutral-500">
-        <p className="mb-2">Ripagaina, Pamplona</p>
-        <p className="mb-2">laksmirbeauty@gmail.com</p>
-        <p>© 2026 Laksmir Beauty Salon</p>
+        <p>© 2024 Laksmir Beauty Salon. Todos los derechos reservados.</p>
+        <p className="mt-2">Dirección: Calle la Valeta 1, Valle de egües, Navarra</p>
+        <p className="mt-2">Teléfono: +34 948 042 190</p>
       </footer>
     </main>
   );
