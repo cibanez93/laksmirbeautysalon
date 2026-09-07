@@ -1,7 +1,4 @@
 import { supabase } from "../lib/supabase";
-
-// Esta función se ejecuta en el servidor antes de mostrar la página,
-// y trae los servicios directamente desde la base de datos de Supabase
 async function getServicios() {
   const { data, error } = await supabase
     .from("servicios")
@@ -74,7 +71,9 @@ export default async function Home() {
           Elige el servicio y el horario que mejor te convenga.
         </p>
         
-        <a href="#"
+       <a href="https://booksy.com/es-es/17203_laksmir-beauty_peluqueria_54309_sarriguren"
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-block bg-neutral-900 text-white px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-700 transition-colors"
         >
           Ver disponibilidad
