@@ -6,10 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "crear-admin": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/crear-admin.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.116.0",
+    "mysql2": "^3.24.4",
     "next": "16.3.3",
     "react": "19.2.8",
     "react-dom": "19.2.8"

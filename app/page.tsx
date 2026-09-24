@@ -1,25 +1,20 @@
-import { supabase } from "../lib/supabase";
 import Image from "next/image";
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-}
+import Link from "next/link";
+import { connection } from "next/server";
+import { listarServiciosActivos, type Servicio } from "../lib/servicios";
 
 async function getServicios(): Promise<{ data: Servicio[]; error: boolean }> {
-  const { data, error } = await supabase
-    .from("servicios")
-    .select("id, nombre, descripcion")
-    .order("id", { ascending: true });
-
-  if (error) {
+  // Leemos la base de datos en cada visita para mostrar siempre los cambios del panel
+  await connection();
+  try {
+    return { data: await listarServiciosActivos(), error: false };
+  } catch (error) {
     console.error("Error al traer los servicios:", error);
     return { data: [], error: true };
   }
-
-  return { data: data ?? [], error: false };
 }
+
+const euros = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
 
 const businessSchema = {
   "@context": "https://schema.org",
@@ -47,7 +42,7 @@ export default async function Home() {
       />
 
       <header className="flex items-center justify-between px-8 py-3 border-b border-neutral-100">
-        <a href="/" aria-label="Laksmir Beauty Salon - Inicio">
+        <Link href="/" aria-label="Laksmir Beauty Salon - Inicio">
           <span className="sr-only">Laksmir Beauty Salon</span>
           <Image
             src="/logo.png"
@@ -58,7 +53,7 @@ export default async function Home() {
             priority
             className="w-auto h-16 md:h-20"
           />
-        </a>
+        </Link>
         <nav aria-label="Navegacion principal" className="hidden md:flex gap-8 text-sm uppercase tracking-wide text-neutral-600">
           <a href="#servicios" className="hover:text-neutral-900 transition-colors">Servicios</a>
           <a href="#reservas" className="hover:text-neutral-900 transition-colors">Reservas</a>
@@ -95,6 +90,14 @@ export default async function Home() {
                   </span>
                   <h3 className="text-lg font-light mt-2 mb-3">{servicio.nombre}</h3>
                   <p className="text-sm text-neutral-600 leading-relaxed">{servicio.descripcion}</p>
+                  {(servicio.precio !== null || servicio.duracion_min !== null) && (
+                    <p className="mt-4 text-sm text-neutral-900 tabular-nums">
+                      {[
+                        servicio.precio !== null && euros.format(servicio.precio),
+                        servicio.duracion_min !== null && `${servicio.duracion_min} min`,
+                      ].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
