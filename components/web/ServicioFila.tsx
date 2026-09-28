@@ -1,4 +1,5 @@
-// Una fila de la lista de servicios, estilo carta (sin precio)
+// Una fila de la lista de servicios, estilo carta (sin precio). Si el servicio tiene foto, sale pequeña al lado.
+import Image from "next/image";
 import { salon } from "@/lib/salon";
 
 export interface ServicioLista {
@@ -6,11 +7,17 @@ export interface ServicioLista {
   nombre: string;
   descripcion: string;
   duracion: string | null;
+  fotoId?: number | null;
 }
 
 export default function ServicioFila({ servicio: s, completo = false }: { servicio: ServicioLista; completo?: boolean }) {
   return (
     <li className="group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 py-5">
+      {s.fotoId && (
+        <div className="relative size-20 shrink-0 overflow-hidden rounded-t-full">
+          <Image src={`/fotos/${s.fotoId}`} alt={s.nombre} fill unoptimized className="object-cover" />
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <h3 className="font-serif text-xl group-hover:text-dorado-oscuro transition-colors">{s.nombre}</h3>
         {s.descripcion && (

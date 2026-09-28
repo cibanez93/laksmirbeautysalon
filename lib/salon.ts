@@ -31,10 +31,14 @@ export const salon = {
   },
 };
 
+// Marcas profesionales con las que trabaja el salón
+export const marcas = ["Wella Professionals", "SP System Professional", "Casmara", "Kinetics", "Tanino Therapy"];
+
 export const menu = [
   { texto: "Servicios", href: "/servicios" },
   { texto: "Novias", href: "/novias" },
   { texto: "Galería", href: "/galeria" },
+  { texto: "Tienda", href: "/tienda" },
   { texto: "Nosotras", href: "/nosotras" },
   { texto: "Blog", href: "/blog" },
   { texto: "Contacto", href: "/contacto" },

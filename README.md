@@ -73,6 +73,8 @@ Necesitas Node 22.18 o superior y MySQL.
    mysql -u root < database/schema.sql
    mysql -u root < database/migraciones/2026-09-28-categorias-galeria-blog.sql
    mysql -u root < database/migraciones/2026-09-29-destacados.sql
+   mysql -u root < database/migraciones/2026-09-30-tienda.sql
+   mysql -u root < database/migraciones/2026-10-01-tarjetas-regalo.sql
    ```
 
 3. Crea un usuario de MySQL para la web:

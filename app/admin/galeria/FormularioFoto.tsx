@@ -1,49 +1,12 @@
 "use client";
 // Formulario para subir o editar fotos de la galería. Antes de enviarlas, las reduce en el
-// propio navegador (máximo 1600 píxeles, formato JPEG) para que pesen poco y la web vaya rápida.
+// propio navegador para que pesen poco y la web vaya rápida.
 // Al editar, si no eliges una foto nueva, se queda la que había.
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import CampoImagen from "@/components/admin/CampoImagen";
+import { reducirImagenes } from "@/components/admin/reducirImagen";
 import type { EstadoFormulario } from "../actions";
-
-const LADO_MAXIMO = 1600;
-
-// Dibuja la foto en un lienzo más pequeño y la guarda como JPEG
-async function reducir(archivo: File): Promise<File> {
-  const bitmap = await createImageBitmap(archivo);
-  const escala = Math.min(1, LADO_MAXIMO / Math.max(bitmap.width, bitmap.height));
-  const lienzo = document.createElement("canvas");
-  lienzo.width = Math.round(bitmap.width * escala);
-  lienzo.height = Math.round(bitmap.height * escala);
-  lienzo.getContext("2d")!.drawImage(bitmap, 0, 0, lienzo.width, lienzo.height);
-  const blob = await new Promise<Blob>((ok, mal) => lienzo.toBlob((b) => (b ? ok(b) : mal(new Error("No se pudo procesar"))), "image/jpeg", 0.82));
-  return new File([blob], "foto.jpg", { type: "image/jpeg" });
-}
-
-function CampoFoto({ nombre, etiqueta, actual }: { nombre: string; etiqueta: string; actual?: string }) {
-  const [vista, setVista] = useState<string | null>(actual ?? null);
-  return (
-    <label className="campo">
-      {etiqueta}
-      <input
-        name={nombre}
-        type="file"
-        accept="image/*"
-        required={!actual}
-        onChange={(e) => {
-          const archivo = e.target.files?.[0];
-          setVista(archivo ? URL.createObjectURL(archivo) : actual ?? null);
-        }}
-        className="input file:mr-4 file:border-0 file:bg-neutral-900 file:text-white file:px-4 file:py-2 file:text-xs file:uppercase file:tracking-wider"
-      />
-      {actual && <span className="normal-case tracking-normal text-neutral-400">Si no eliges ninguna, se queda la foto actual.</span>}
-      {vista && (
-        // eslint-disable-next-line @next/next/no-img-element -- vista previa, no hace falta optimizar
-        <img src={vista} alt="" className="mt-2 h-40 w-auto object-cover border border-neutral-200" />
-      )}
-    </label>
-  );
-}
 
 interface Props {
   accion: (prev: EstadoFormulario, formData: FormData) => Promise<EstadoFormulario>;
@@ -59,12 +22,7 @@ export default function FormularioFoto({ accion, categorias, inicial }: Props) {
   // Antes de llamar a la acción del servidor, reducimos las fotos elegidas
   const [estado, enviar, enviando] = useActionState(async (prev: EstadoFormulario, formData: FormData) => {
     setErrorLocal(null);
-    try {
-      for (const campo of ["imagen", "imagen_antes"]) {
-        const archivo = formData.get(campo);
-        if (archivo instanceof File && archivo.size > 0) formData.set(campo, await reducir(archivo));
-      }
-    } catch {
+    if (!(await reducirImagenes(formData, ["imagen", "imagen_antes"]))) {
       setErrorLocal("No se ha podido leer la foto. Prueba con otra imagen (JPG o PNG).");
       return prev;
     }
@@ -125,11 +83,11 @@ export default function FormularioFoto({ accion, categorias, inicial }: Props) {
 
       {tipo === "antes_despues" ? (
         <div className="grid sm:grid-cols-2 gap-6">
-          <CampoFoto nombre="imagen_antes" etiqueta={inicial ? "Cambiar la foto de ANTES" : "Foto de ANTES *"} actual={actual("/antes")} />
-          <CampoFoto nombre="imagen" etiqueta={inicial ? "Cambiar la foto de DESPUÉS" : "Foto de DESPUÉS *"} actual={actual("")} />
+          <CampoImagen nombre="imagen_antes" etiqueta={inicial ? "Cambiar la foto de ANTES" : "Foto de ANTES *"} actual={actual("/antes")} obligatorio />
+          <CampoImagen nombre="imagen" etiqueta={inicial ? "Cambiar la foto de DESPUÉS" : "Foto de DESPUÉS *"} actual={actual("")} obligatorio />
         </div>
       ) : (
-        <CampoFoto nombre="imagen" etiqueta={inicial ? "Cambiar la foto" : "Foto *"} actual={actual("")} />
+        <CampoImagen nombre="imagen" etiqueta={inicial ? "Cambiar la foto" : "Foto *"} actual={actual("")} obligatorio />
       )}
 
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}

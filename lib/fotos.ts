@@ -21,13 +21,14 @@ export interface Foto {
 export const urlFoto = (id: number) => `/fotos/${id}`;
 export const urlFotoAntes = (id: number) => `/fotos/${id}/antes`;
 
+// Fotos de la galería (no las de servicios y productos).
 // Ojo: aquí NO se piden las columnas de imagen, que pesan mucho. Solo los datos.
 export async function listarFotos({ soloVisibles }: { soloVisibles: boolean }): Promise<Foto[]> {
   const [rows] = await db.query<RowDataPacket[]>(
     `SELECT f.id, f.titulo, c.nombre AS categoria, f.tipo, f.forma, f.visible
        FROM fotos f
        LEFT JOIN categorias c ON c.id = f.categoria_id
-      ${soloVisibles ? "WHERE f.visible = TRUE" : ""}
+      WHERE f.origen = 'galeria' ${soloVisibles ? "AND f.visible = TRUE" : ""}
       ORDER BY f.creado_en DESC, f.id DESC`
   );
   return rows.map((f) => ({ id: f.id, titulo: f.titulo, categoria: f.categoria, tipo: f.tipo, forma: f.forma, visible: Boolean(f.visible) }));
@@ -83,4 +84,18 @@ export async function cambiarVisibleFoto(id: number, visible: boolean) {
 
 export async function borrarFoto(id: number) {
   await db.execute("DELETE FROM fotos WHERE id = ?", [id]);
+}
+
+// Foto de un servicio, un producto o una tarjeta regalo: no sale en la galería. Devuelve su id.
+export async function crearImagenInterna(titulo: string, origen: "servicio" | "producto" | "tarjeta", imagen: Buffer): Promise<number> {
+  const [res] = await db.execute<ResultSetHeader>(
+    "INSERT INTO fotos (titulo, tipo, origen, imagen, visible) VALUES (?, 'foto', ?, ?, FALSE)",
+    [titulo.slice(0, 120), origen, imagen]
+  );
+  return res.insertId;
+}
+
+// Borra una foto de servicio, producto o tarjeta que ya no se usa (nunca borra fotos de la galería)
+export async function borrarImagenInterna(id: number) {
+  await db.execute("DELETE FROM fotos WHERE id = ? AND origen IN ('servicio', 'producto', 'tarjeta')", [id]);
 }

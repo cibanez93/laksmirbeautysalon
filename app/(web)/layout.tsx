@@ -4,16 +4,19 @@ import BotonAsistente from "@/components/web/BotonAsistente";
 import { ChatProveedor } from "@/components/web/chat/ChatContexto";
 import Cabecera from "@/components/web/Cabecera";
 import Pie from "@/components/web/Pie";
+import { CarritoProveedor } from "@/components/tienda/CarritoContexto";
 
 export default function WebLayout({ children }: LayoutProps<"/">) {
   return (
-    <ChatProveedor>
-      <div className="min-h-screen flex flex-col bg-crema text-neutral-900">
-        <Cabecera />
-        <main className="flex-1">{children}</main>
-        <Pie />
-        <BotonAsistente />
-      </div>
-    </ChatProveedor>
+    <CarritoProveedor>
+      <ChatProveedor>
+        <div className="min-h-screen flex flex-col bg-crema text-neutral-900">
+          <Cabecera />
+          <main className="flex-1">{children}</main>
+          <Pie />
+          <BotonAsistente />
+        </div>
+      </ChatProveedor>
+    </CarritoProveedor>
   );
 }

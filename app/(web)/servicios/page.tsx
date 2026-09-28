@@ -23,7 +23,7 @@ async function getGrupos(): Promise<GrupoServicios[] | null> {
         fotoId: destacados[`categoria-${c.slug}`]?.foto_id ?? null,
         servicios: servicios
           .filter((s) => s.categoria === c.slug)
-          .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min) })),
+          .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min), fotoId: s.foto_id })),
       }))
       .filter((g) => g.servicios.length > 0);
   } catch (error) {

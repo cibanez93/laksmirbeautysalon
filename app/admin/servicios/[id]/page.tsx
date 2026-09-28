@@ -20,7 +20,7 @@ export default async function EditarServicioPage({ params }: PageProps<"/admin/s
       <main className="max-w-2xl mx-auto px-4 md:px-8 pb-16">
         <h1 className="text-2xl font-light mb-8">Editar servicio</h1>
         {/* bind "fija" el id como primer argumento de la acción */}
-        <ServicioForm accion={editarServicio.bind(null, id)} categorias={await listarCategorias()} inicial={servicio} textoBoton="Guardar cambios" />
+        <ServicioForm accion={editarServicio.bind(null, id)} categorias={await listarCategorias()} inicial={servicio} version={servicio.version} textoBoton="Guardar cambios" />
       </main>
     </>
   );

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { duracionBonita } from "@/lib/categorias";
 import { listarCategorias, listarServicios } from "@/lib/servicios";
 import { requireSession } from "@/lib/session";
+import { euros } from "@/lib/tienda";
 import { alternarActivo } from "./actions";
 import BotonBorrar from "./BotonBorrar";
 import MenuAdmin from "./MenuAdmin";
@@ -46,9 +47,12 @@ export default async function AdminPage() {
                           {!s.activo && (
                             <span className="ml-2 align-middle text-[10px] uppercase tracking-wider bg-neutral-200 text-neutral-600 px-2 py-0.5">Oculto</span>
                           )}
+                          {s.regalable && (
+                            <span className="ml-2 align-middle text-[10px] uppercase tracking-wider bg-dorado/15 text-dorado-oscuro px-2 py-0.5">Bono regalo</span>
+                          )}
                         </p>
                         <p className="text-sm text-neutral-500">
-                          {[duracionBonita(s.duracion_min), `orden ${s.orden}`].filter(Boolean).join(" · ")}
+                          {[duracionBonita(s.duracion_min), s.regalable && s.precio !== null && `bono ${euros(s.precio)}`, s.foto_id && "con foto", `orden ${s.orden}`].filter(Boolean).join(" · ")}
                         </p>
                       </div>
                       <div className="flex items-center gap-5 text-sm">

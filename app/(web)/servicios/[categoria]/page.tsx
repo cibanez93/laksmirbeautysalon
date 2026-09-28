@@ -29,7 +29,7 @@ async function getServicios(slug: string) {
     const servicios = await listarServiciosActivos();
     return servicios
       .filter((s) => s.categoria === slug)
-      .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min) }));
+      .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min), fotoId: s.foto_id }));
   } catch (error) {
     console.error("Error al traer los servicios:", error);
     return null;

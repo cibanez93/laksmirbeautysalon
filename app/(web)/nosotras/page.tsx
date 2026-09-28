@@ -9,7 +9,7 @@ import { obtenerOpiniones } from "@/lib/opiniones";
 import Loto from "@/components/web/Loto";
 import { categorias } from "@/lib/categorias";
 import { equipo } from "@/lib/equipo";
-import { salon } from "@/lib/salon";
+import { marcas, salon } from "@/lib/salon";
 
 export const metadata: Metadata = {
   title: "Nosotras: el equipo de Laksmir Beauty Salon en Ripagaina, Pamplona",
@@ -25,7 +25,6 @@ const valores = [
   { titulo: "Formación continua", texto: "Nos formamos constantemente para ofrecerte las últimas técnicas y tratamientos." },
 ];
 
-const marcas = ["Wella Professionals", "SP System Professional", "Casmara", "Kinetics", "Tanino Therapy"];
 
 export default async function NosotrasPage() {
   await connection();

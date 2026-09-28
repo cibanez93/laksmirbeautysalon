@@ -146,6 +146,37 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
 5. **Publicación**: base de datos en TiDB, web en Netlify, dominio y quitar el mantenimiento.
 6. **Contenido real**: fotos del salón y primeros artículos del blog.
 
+## 8. Tienda online
+
+**Qué se vende**
+- **Bonos regalo de servicios**: se compra un servicio concreto para regalar (por ejemplo, una limpieza facial). Quien lo recibe reserva la cita presentando el código. **Caducan al año.** Mismo precio que en Booksy.
+- **Tarjetas regalo por importe**: 30, 50, 100 €... para gastar en el salón. Caducan al año.
+- **Productos físicos**: champús, mascarillas, esmaltes... **Recogida en el salón o envío a casa.**
+
+**Cómo**: tienda propia dentro de la web, con pago por **Stripe** (Stripe Checkout: la página de pago la pone Stripe, así los datos de la tarjeta nunca pasan por nuestro servidor).
+
+**Excepción a "sin precios"**: en la tienda sí se ven precios, porque es obligatorio para vender.
+
+**Qué hace falta del salón (no se puede hacer desde el código)**
+- Cuenta de Stripe a nombre del negocio (la crea Carla) y sus claves.
+- Textos legales revisados por la gestoría: aviso legal, privacidad, condiciones de venta, devoluciones (14 días de desistimiento) y cookies.
+- Lista de productos con foto, precio y stock.
+- Gastos de envío (precio y a partir de cuánto es gratis) y con qué transportista.
+- Cómo se canjean los bonos en el salón.
+- Servicio de emails para enviar los bonos (por ejemplo Resend, gratis hasta 3.000 al mes).
+
+**Fases**
+1. ✅ Diseño de la tienda (visual, con datos de ejemplo): página de tienda (tarjetas regalo, bonos con filtro por categoría, productos), carrito guardado en el navegador, mensaje para el regalo, recogida o envío. Los bonos usan los precios de Booksy y solo salen servicios de 15 € o más.
+2. Base de datos:
+   - ✅ Tarjetas regalo gestionadas desde el panel (sección Tienda): nombre, importe, diseño propio (foto) u opcionalmente el diseño negro y dorado, orden y visible.
+   - ✅ Productos gestionados desde el panel (sección Tienda): foto, marca, descripción, precio, stock y visible. Con stock 0 salen como agotados.
+   - ✅ Cada servicio puede tener foto (sale en su lista y en su bono), precio para la tienda y la casilla «Se puede regalar».
+   - ⬜ Pedidos y bonos vendidos (con código único).
+3. Pago con Stripe en modo de pruebas (tarjetas de prueba, sin dinero real).
+4. Después del pago: confirmación, email con el bono y aviso al salón.
+5. Panel: productos y stock, pedidos, y canjear bonos (marcar como usado).
+6. Páginas legales y pasar Stripe a modo real.
+
 ## Pendiente de revisar con Carla
 
 - Textos de presentación y respuestas de las preguntas frecuentes de cada categoría (`lib/categorias.ts`).

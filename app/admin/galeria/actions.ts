@@ -5,20 +5,7 @@ import { redirect } from "next/navigation";
 import * as fotos from "@/lib/fotos";
 import { requireSession } from "@/lib/session";
 import type { EstadoFormulario } from "../actions";
-import { comprobarId, valoresDe } from "../utilidades";
-
-const MAX_BYTES = 1.5 * 1024 * 1024; // 1,5 MB por foto (el panel ya las reduce a ~300 KB)
-
-// Comprueba que el archivo es una foto JPEG de tamaño razonable y la convierte en Buffer
-async function leerImagen(valor: FormDataEntryValue | null): Promise<Buffer | string> {
-  if (!(valor instanceof File) || valor.size === 0) return "Falta la foto.";
-  if (valor.type !== "image/jpeg") return "La foto tiene que ser una imagen.";
-  if (valor.size > MAX_BYTES) return "La foto es demasiado grande.";
-  const datos = Buffer.from(await valor.arrayBuffer());
-  // Los JPEG siempre empiezan por los bytes FF D8: así comprobamos que de verdad es una foto
-  if (datos[0] !== 0xff || datos[1] !== 0xd8) return "El archivo no es una foto válida.";
-  return datos;
-}
+import { comprobarId, leerImagen, leerImagenOpcional, valoresDe } from "../utilidades";
 
 // Lee y valida los campos comunes (título, categoría y forma)
 function leerDatos(formData: FormData) {
@@ -34,12 +21,6 @@ function leerDatos(formData: FormData) {
   if (categoria_id !== null && (!Number.isInteger(categoria_id) || categoria_id <= 0)) return "Categoría no válida.";
 
   return { titulo, forma, categoria_id };
-}
-
-// Si se eligió un archivo, lo comprueba; si no, devuelve null (se queda la foto que había)
-async function leerImagenOpcional(valor: FormDataEntryValue | null) {
-  if (!(valor instanceof File) || valor.size === 0) return null;
-  return leerImagen(valor);
 }
 
 export async function subirFoto(_prev: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
