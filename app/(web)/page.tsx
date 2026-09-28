@@ -10,6 +10,7 @@ import { Esquinas, FotoDestacada, TituloSeccion } from "@/components/web/decorac
 import TarjetaProfesional from "@/components/web/TarjetaProfesional";
 import { duracionBonita, nombreBonito } from "@/lib/categorias";
 import { obtenerDestacadosSeguro } from "@/lib/destacados";
+import { obtenerOpiniones } from "@/lib/opiniones";
 import { equipo } from "@/lib/equipo";
 import { listarFotos, urlFoto, urlFotoAntes } from "@/lib/fotos";
 import { salon } from "@/lib/salon";
@@ -76,7 +77,7 @@ const recortar = (t: string) => (t.length <= 140 ? t : `${t.slice(0, 140).replac
 
 export default async function InicioPage() {
   await connection();
-  const d = await obtenerDestacadosSeguro();
+  const [d, opiniones] = await Promise.all([obtenerDestacadosSeguro(), obtenerOpiniones()]);
   const destacados = destacadosEjemplo.map((ejemplo, i) => {
     const elegido = d[`destacado-${i + 1}`];
     const s = elegido?.servicio;
@@ -114,13 +115,13 @@ export default async function InicioPage() {
           </div>
           <div className="flex gap-8 text-sm">
             <div>
-              <p className="font-serif text-3xl">{salon.opiniones.google.nota} <span className="text-dorado">★</span></p>
-              <p className="text-neutral-500">{salon.opiniones.google.total} opiniones en Google</p>
+              <p className="font-serif text-3xl">{opiniones.google.nota} <span className="text-dorado">★</span></p>
+              <p className="text-neutral-500">{opiniones.google.total} opiniones en Google</p>
             </div>
             <div className="w-px bg-[#E0D3C2]" />
             <div>
-              <p className="font-serif text-3xl">{salon.opiniones.booksy.nota} <span className="text-dorado">★</span></p>
-              <p className="text-neutral-500">{salon.opiniones.booksy.total} opiniones en Booksy</p>
+              <p className="font-serif text-3xl">{opiniones.booksy.nota} <span className="text-dorado">★</span></p>
+              <p className="text-neutral-500">{opiniones.booksy.total} opiniones en Booksy</p>
             </div>
           </div>
         </div>

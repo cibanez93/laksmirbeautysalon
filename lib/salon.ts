@@ -24,6 +24,7 @@ export const salon = {
     comoLlegar: "https://www.google.com/maps/dir/?api=1&destination=Laksmir+Beauty,+Calle+la+Valeta+1,+31621+Pamplona,+Navarra",
     embed: "https://www.google.com/maps?q=Laksmir+Beauty,+Calle+la+Valeta+1,+31621+Pamplona,+Navarra&output=embed",
   },
+  // Valores de reserva: la web los usa si no puede leer las opiniones actuales (ver lib/opiniones.ts)
   opiniones: {
     google: { nota: "4,7", total: 142 },
     booksy: { nota: "5,0", total: 405 },

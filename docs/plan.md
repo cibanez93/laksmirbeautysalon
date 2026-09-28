@@ -82,6 +82,7 @@ _Pendiente: detallar las secciones de cada página._
 ## 4. Funcionalidades
 
 **Lo que ya funciona**
+- Las opiniones de Booksy de la portada se actualizan solas una vez al día. Las de Google se cambian a mano en `lib/salon.ts` (se pueden automatizar con la API de Google Places, que pide tarjeta).
 - Servicios cargados desde la base de datos (MySQL).
 - Panel de administración con login para crear, editar, ocultar y borrar servicios.
 - Botón de reservar que lleva a Booksy.

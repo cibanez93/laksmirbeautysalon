@@ -5,6 +5,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Adorno, Esquinas, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
 import { obtenerDestacadosSeguro } from "@/lib/destacados";
+import { obtenerOpiniones } from "@/lib/opiniones";
 import Loto from "@/components/web/Loto";
 import { categorias } from "@/lib/categorias";
 import { equipo } from "@/lib/equipo";
@@ -28,7 +29,7 @@ const marcas = ["Wella Professionals", "SP System Professional", "Casmara", "Kin
 
 export default async function NosotrasPage() {
   await connection();
-  const d = await obtenerDestacadosSeguro();
+  const [d, opiniones] = await Promise.all([obtenerDestacadosSeguro(), obtenerOpiniones()]);
   const años = new Date().getFullYear() - APERTURA;
   const nombreCategoria = (slug: string) => categorias.find((c) => c.slug === slug)?.nombre ?? slug;
 
@@ -57,7 +58,7 @@ export default async function NosotrasPage() {
           </div>
           <div className="mt-8 flex gap-10">
             <div>
-              <p className="font-serif text-3xl">{salon.opiniones.booksy.total + salon.opiniones.google.total}+</p>
+              <p className="font-serif text-3xl">{opiniones.booksy.total + opiniones.google.total}+</p>
               <p className="text-sm text-neutral-500">opiniones de clientas</p>
             </div>
             <div className="w-px bg-[#E0D3C2]" />
