@@ -108,7 +108,6 @@ export default async function TiendaPage() {
               {tarjetas.map((t) => (
                 <li key={t.id} className="flex flex-col gap-3">
                   <TarjetaVisual importe={t.importe} fotoId={t.foto_id} nombre={t.nombre} />
-                  {t.nombre !== "Tarjeta regalo" && <p className="font-serif text-center -mt-1">{t.nombre}</p>}
                   <BotonAnadir articulo={{ id: `tarjeta-${t.id}`, tipo: "tarjeta", nombre: `${t.nombre} de ${euros(t.importe)}`, precio: t.importe }} />
                 </li>
               ))}
