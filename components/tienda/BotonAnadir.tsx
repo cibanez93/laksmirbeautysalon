@@ -1,5 +1,5 @@
 "use client";
-// Botón "Añadir al carrito" con confirmación visual
+// Botón "Añadir al carrito" (dorado, el color de la marca) con confirmación visual al pulsarlo
 import Link from "next/link";
 import { useState } from "react";
 import type { ArticuloCarrito } from "@/lib/tienda";
@@ -11,7 +11,7 @@ export default function BotonAnadir({ articulo, className = "" }: { articulo: Om
 
   if (anadido) {
     return (
-      <Link href="/tienda/carrito" className={`text-center text-xs uppercase tracking-widest px-4 py-3 bg-dorado text-white hover:bg-dorado-oscuro transition-colors ${className}`}>
+      <Link href="/tienda/carrito" className={`text-center text-xs uppercase tracking-widest px-4 py-3 bg-neutral-900 text-white hover:bg-dorado-oscuro transition-colors ${className}`}>
         ✓ Añadido · Ver carrito
       </Link>
     );
@@ -25,7 +25,7 @@ export default function BotonAnadir({ articulo, className = "" }: { articulo: Om
         setAnadido(true);
         setTimeout(() => setAnadido(false), 3000);
       }}
-      className={`text-xs uppercase tracking-widest px-4 py-3 bg-neutral-900 text-white hover:bg-dorado-oscuro transition-colors ${className}`}
+      className={`text-xs uppercase tracking-widest px-4 py-3 bg-dorado text-neutral-900 hover:bg-neutral-900 hover:text-white transition-colors ${className}`}
     >
       Añadir al carrito
     </button>

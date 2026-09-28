@@ -1,40 +1,21 @@
-// Página de TIENDA: tarjetas regalo, bonos regalo de servicios y productos.
+// Página de TIENDA: tarjetas regalo y productos.
+// Los bonos de servicios concretos se compran desde las páginas de servicios (botón "Regalar").
 // Los productos y los bonos se gestionan en el panel. El pago todavía no funciona.
 // Es la única parte de la web con precios (obligatorio para vender).
 import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 import BotonAnadir from "@/components/tienda/BotonAnadir";
 import TarjetaVisual from "@/components/tienda/TarjetaVisual";
 import { Adorno, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
-import { categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
 import { listarProductosActivos, type Producto } from "@/lib/productos";
-import { listarServiciosParaRegalo } from "@/lib/servicios";
 import { listarTarjetasActivas, type TarjetaRegalo } from "@/lib/tarjetas";
 import { euros, MESES_CADUCIDAD, productosEjemplo } from "@/lib/tienda";
-import ListaBonos, { type Bono } from "./ListaBonos";
 
 export const metadata: Metadata = {
   title: "Tienda y tarjetas regalo | Laksmir Beauty Salon, Ripagaina",
   description: "Regala belleza: bonos regalo de servicios, tarjetas regalo y productos profesionales de Laksmir Beauty Salon en Ripagaina (Pamplona).",
 };
-
-async function getBonos(): Promise<Bono[]> {
-  await connection();
-  try {
-    const servicios = await listarServiciosParaRegalo();
-    return servicios.map((s) => ({
-      id: s.id,
-      fotoId: s.foto_id,
-      nombre: nombreBonito(s.nombre),
-      categoria: categorias.find((c) => c.slug === s.categoria)?.nombre ?? "Otros",
-      duracion: duracionBonita(s.duracion_min),
-      precio: s.precio,
-    }));
-  } catch (error) {
-    console.error("Error al traer los bonos:", error);
-    return [];
-  }
-}
 
 async function getProductos(): Promise<Producto[]> {
   try {
@@ -61,8 +42,8 @@ const pasos = [
 ];
 
 export default async function TiendaPage() {
-  const [bonos, productos, tarjetas] = await Promise.all([getBonos(), getProductos(), getTarjetas()]);
-  const categoriasConBonos = categorias.map((c) => c.nombre).filter((n) => bonos.some((b) => b.categoria === n));
+  await connection();
+  const [productos, tarjetas] = await Promise.all([getProductos(), getTarjetas()]);
 
   return (
     <>
@@ -74,7 +55,7 @@ export default async function TiendaPage() {
         <nav aria-label="Secciones de la tienda" className="flex flex-wrap justify-center gap-3">
           {[
             { texto: "Tarjetas regalo", href: "#tarjetas" },
-            { texto: "Bonos de servicios", href: "#bonos" },
+            { texto: "Regalar un servicio", href: "#regalar-servicio" },
             { texto: "Productos", href: "#productos" },
           ].map((s) => (
             <a key={s.href} href={s.href} className="border border-dorado text-dorado text-xs uppercase tracking-widest px-6 py-3 hover:bg-dorado hover:text-neutral-900 transition-colors">
@@ -116,15 +97,18 @@ export default async function TiendaPage() {
         </div>
       </section>
 
-      {/* Bonos de servicios */}
-      <section id="bonos" className="scroll-mt-24 bg-white px-4 md:px-8 py-20">
-        <div className="max-w-6xl mx-auto">
-          <TituloSeccion antetitulo="Regala un servicio concreto" titulo="Bonos regalo" />
-          {bonos.length === 0 ? (
-            <p className="text-center text-neutral-500">Muy pronto podrás regalar nuestros servicios desde aquí.</p>
-          ) : (
-            <ListaBonos bonos={bonos} categorias={categoriasConBonos} />
-          )}
+      {/* Regalar un servicio: se hace desde las páginas de servicios */}
+      <section id="regalar-servicio" className="scroll-mt-24 bg-white px-4 md:px-8 py-16">
+        <div className="relative max-w-3xl mx-auto text-center border border-linea px-6 py-12">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-2 border border-dorado/30" />
+          <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">Bonos regalo</p>
+          <h2 className="font-serif text-3xl md:text-4xl mb-4">¿Quieres regalar un servicio concreto?</h2>
+          <p className="text-neutral-600 max-w-lg mx-auto mb-8">
+            Un corte, una limpieza facial, una manicura… Búscalo en nuestros servicios y pulsa <strong className="font-medium text-neutral-900">«Regalar»</strong>.
+          </p>
+          <Link href="/servicios" className="inline-block bg-dorado text-neutral-900 text-sm uppercase tracking-widest px-8 py-4 hover:bg-neutral-900 hover:text-white transition-colors">
+            Ver servicios para regalar
+          </Link>
         </div>
       </section>
 

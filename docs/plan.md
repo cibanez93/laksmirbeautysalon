@@ -171,6 +171,7 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
    - ✅ Tarjetas regalo gestionadas desde el panel (sección Tienda): nombre, importe, diseño propio (foto) u opcionalmente el diseño negro y dorado, orden y visible.
    - ✅ Productos gestionados desde el panel (sección Tienda): foto, marca, descripción, precio, stock y visible. Con stock 0 salen como agotados.
    - ✅ Cada servicio puede tener foto (sale en su lista y en su bono), precio para la tienda y la casilla «Se puede regalar».
+   - ✅ Decisión: los bonos de servicios se compran desde las listas de servicios (botón «Regalar» junto a «Reservar»). La tienda solo tiene tarjetas regalo y productos, con un aviso que lleva a Servicios.
    - ⬜ Pedidos y bonos vendidos (con código único).
 3. Pago con Stripe en modo de pruebas (tarjetas de prueba, sin dinero real).
 4. Después del pago: confirmación, email con el bono y aviso al salón.

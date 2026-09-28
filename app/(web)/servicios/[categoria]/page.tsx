@@ -29,7 +29,15 @@ async function getServicios(slug: string) {
     const servicios = await listarServiciosActivos();
     return servicios
       .filter((s) => s.categoria === slug)
-      .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min), fotoId: s.foto_id }));
+      .map((s) => ({
+        id: s.id,
+        nombre: nombreBonito(s.nombre),
+        descripcion: s.descripcion,
+        duracion: duracionBonita(s.duracion_min),
+        fotoId: s.foto_id,
+        // Si se puede regalar, sale el botón "Regalar"
+        regalo: s.regalable && s.precio ? { precio: s.precio, categoria: categoriaPorSlug(slug)?.nombre ?? "" } : null,
+      }));
   } catch (error) {
     console.error("Error al traer los servicios:", error);
     return null;

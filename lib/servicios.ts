@@ -106,26 +106,3 @@ export async function cambiarActivo(id: number, activo: boolean) {
 export async function borrarServicio(id: number) {
   await db.execute("DELETE FROM servicios WHERE id = ?", [id]);
 }
-
-export interface ServicioRegalo {
-  id: number;
-  foto_id: number | null;
-  nombre: string;
-  descripcion: string;
-  duracion_min: number | null;
-  precio: number;
-  categoria: string | null; // slug
-}
-
-// Servicios que se pueden comprar como bono regalo: activos, con precio y marcados como "se puede regalar"
-export async function listarServiciosParaRegalo(): Promise<ServicioRegalo[]> {
-  const [rows] = await db.query<RowDataPacket[]>(
-    `SELECT s.id, s.foto_id, s.nombre, s.descripcion, s.duracion_min, s.precio, c.slug AS categoria
-       FROM servicios s
-       LEFT JOIN categorias c ON c.id = s.categoria_id
-      WHERE s.activo = TRUE AND s.regalable = TRUE AND s.precio IS NOT NULL
-      ${ORDEN}`
-  );
-  // mysql2 devuelve DECIMAL como texto: lo convertimos a número
-  return rows.map((f) => ({ id: f.id, foto_id: f.foto_id, nombre: f.nombre, descripcion: f.descripcion, duracion_min: f.duracion_min, precio: Number(f.precio), categoria: f.categoria }));
-}

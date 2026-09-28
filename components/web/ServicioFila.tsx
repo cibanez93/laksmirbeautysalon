@@ -1,5 +1,6 @@
 // Una fila de la lista de servicios, estilo carta (sin precio). Si el servicio tiene foto, sale pequeña al lado.
 import Image from "next/image";
+import BotonRegalar from "@/components/tienda/BotonRegalar";
 import { salon } from "@/lib/salon";
 
 export interface ServicioLista {
@@ -8,6 +9,7 @@ export interface ServicioLista {
   descripcion: string;
   duracion: string | null;
   fotoId?: number | null;
+  regalo?: { precio: number; categoria: string } | null; // si se puede comprar como bono regalo
 }
 
 export default function ServicioFila({ servicio: s, completo = false }: { servicio: ServicioLista; completo?: boolean }) {
@@ -26,6 +28,7 @@ export default function ServicioFila({ servicio: s, completo = false }: { servic
       </div>
       <div className="flex items-center gap-6 shrink-0">
         {s.duracion && <span className="text-xs uppercase tracking-wider text-neutral-500">{s.duracion}</span>}
+        {s.regalo && <BotonRegalar servicioId={s.id} nombre={s.nombre} categoria={s.regalo.categoria} precio={s.regalo.precio} />}
         <a
           href={salon.booksy}
           target="_blank"
