@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Laksmir Beauty Salon",
-  description: "Peluqueria y estetica profesional en Pamplona",
+  description: "Peluquería y estética profesional en Ripagaina, Pamplona. Reserva tu cita online.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

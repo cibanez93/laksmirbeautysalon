@@ -11,6 +11,13 @@
   --font-sans: var(--font-montserrat);
   --font-brand: var(--font-brand);
   --font-serif: var(--font-abhaya);
+
+  /* Colores de la marca (se usan como bg-crema, text-dorado, border-linea...) */
+  --color-crema: #FAF6F1;
+  --color-arena: #F1E8DD;
+  --color-linea: #E8DDD0;
+  --color-dorado: #C2A17B;
+  --color-dorado-oscuro: #9C7B55;
 }
 
 body {

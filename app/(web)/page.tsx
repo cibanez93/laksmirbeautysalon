@@ -1,143 +1,221 @@
-import Image from "next/image";
+// Página de INICIO
+// Fase de diseño: las fotos son huecos de ejemplo y algunos datos están escritos a mano.
+// Cuando existan las tablas de categorías y galería, se leerán de la base de datos.
 import Link from "next/link";
-import { connection } from "next/server";
-import { listarServiciosActivos, type Servicio } from "../lib/servicios";
+import AbiertoAhora from "@/components/web/AbiertoAhora";
+import AntesDespues from "@/components/web/AntesDespues";
+import AsistentePortada from "@/components/web/chat/AsistentePortada";
+import { Esquinas, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import TarjetaProfesional from "@/components/web/TarjetaProfesional";
+import { equipo } from "@/lib/equipo";
+import { salon } from "@/lib/salon";
 
-async function getServicios(): Promise<{ data: Servicio[]; error: boolean }> {
-  // Leemos la base de datos en cada visita para mostrar siempre los cambios del panel
-  await connection();
-  try {
-    return { data: await listarServiciosActivos(), error: false };
-  } catch (error) {
-    console.error("Error al traer los servicios:", error);
-    return { data: [], error: true };
-  }
-}
+const categorias = [
+  { nombre: "Peluquería", slug: "peluqueria", servicios: 18, tono: "from-[#E9DCCB] to-[#D8C3A8]" },
+  { nombre: "Tratamientos faciales", slug: "tratamientos-faciales", servicios: 13, tono: "from-[#F1E6DA] to-[#E2CDB5]" },
+  { nombre: "Manicura", slug: "manicura", servicios: 13, tono: "from-[#EADBD0] to-[#D9BFAE]" },
+  { nombre: "Pedicura", slug: "pedicura", servicios: 7, tono: "from-[#F2E6DC] to-[#DEC6B2]" },
+  { nombre: "Diseño de mirada", slug: "diseno-de-mirada", servicios: 7, tono: "from-[#EFE4D6] to-[#DCC6AB]" },
+  { nombre: "Tratamientos corporales", slug: "tratamientos-corporales", servicios: 4, tono: "from-[#E6DDD0] to-[#CFBEA6]" },
+  { nombre: "Masajes", slug: "masajes", servicios: 3, tono: "from-[#EDE3D8] to-[#D6C1A9]" },
+  { nombre: "Maquillaje", slug: "maquillaje", servicios: 2, tono: "from-[#F0E2D7] to-[#DDC3B0]" },
+];
 
-const euros = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" });
+const destacados = [
+  { nombre: "Experiencia Brûlée", categoria: "Peluquería", descripcion: "Diagnóstico capilar, diseño del color, balayage premium y tratamiento reparador.", duracion: "5 h" },
+  { nombre: "Limpieza facial profunda", categoria: "Tratamientos faciales", descripcion: "Purifica y oxigena la piel con tecnología profesional y oxígeno puro.", duracion: "60 min" },
+  { nombre: "Balayage", categoria: "Peluquería", descripcion: "Mechas a mano alzada con un degradado suave y natural, diseñadas a medida para iluminar tu melena.", duracion: "3 h 30 min" },
+];
 
-const businessSchema = {
+
+// Datos para Google (schema.org): ayudan a salir en búsquedas locales
+const datosGoogle = {
   "@context": "https://schema.org",
   "@type": "BeautySalon",
-  name: "Laksmir Beauty Salon",
+  name: salon.nombre,
   telephone: "+34948042190",
+  url: salon.web,
+  image: `${salon.web}/logo.png`,
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Calle la Valeta 1",
-    addressLocality: "Valle de Egues",
-    addressRegion: "Navarra",
+    streetAddress: salon.direccion.calle,
+    postalCode: salon.direccion.cp,
+    addressLocality: salon.direccion.localidad,
+    addressRegion: salon.direccion.provincia,
     addressCountry: "ES",
   },
-  url: "https://laksmirbeautysalon.com",
+  openingHoursSpecification: [
+    { "@type": "OpeningHoursSpecification", dayOfWeek: "Monday", opens: "13:00", closes: "20:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday"], opens: "10:00", closes: "20:00" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:00", closes: "13:00" },
+  ],
+  sameAs: [salon.instagram.url, salon.booksy],
 };
 
-export default async function Home() {
-  const { data: servicios, error } = await getServicios();
-
+export default function InicioPage() {
   return (
-    <main className="min-h-screen bg-white text-neutral-900">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(businessSchema) }}
-      />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosGoogle) }} />
 
-      <header className="flex items-center justify-between px-8 py-3 border-b border-neutral-100">
-        <Link href="/" aria-label="Laksmir Beauty Salon - Inicio">
-          <span className="sr-only">Laksmir Beauty Salon</span>
-          <Image
-            src="/logo.png"
-            alt=""
-            aria-hidden="true"
-            width={800}
-            height={243}
-            priority
-            className="w-auto h-16 md:h-20"
-          />
-        </Link>
-        <nav aria-label="Navegacion principal" className="hidden md:flex gap-8 text-sm uppercase tracking-wide text-neutral-600">
-          <a href="#servicios" className="hover:text-neutral-900 transition-colors">Servicios</a>
-          <a href="#reservas" className="hover:text-neutral-900 transition-colors">Reservas</a>
-          <a href="#contacto" className="hover:text-neutral-900 transition-colors">Contacto</a>
-        </nav>
-      </header>
-
-      <section className="flex flex-col items-center justify-center text-center px-6 py-28">
-        <p className="text-sm uppercase tracking-widest text-neutral-500 mb-4">Belleza y bienestar</p>
-        <h1 className="text-4xl md:text-6xl font-light mb-6 max-w-2xl">Permitete brillar</h1>
-        <p className="text-neutral-600 max-w-md mb-10">Peluqueria y estetica profesional en Pamplona. Reserva tu cita y dejate cuidar.</p>
-        <a href="#reservas" className="border border-neutral-900 px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-900 hover:text-white transition-colors">Reservar cita</a>
-      </section>
-
-      <section id="servicios" className="px-8 py-24 bg-neutral-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-baseline justify-between mb-16 border-b border-neutral-200 pb-6">
-            <h2 className="text-2xl font-light">Nuestros servicios</h2>
-            <span className="hidden md:block text-xs uppercase tracking-widest text-neutral-400">
-              Peluqueria &amp; Estetica
-            </span>
+      {/* Portada */}
+      <section className="relative max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center px-4 md:px-8 py-16 md:py-24 overflow-hidden md:overflow-visible">
+        <span aria-hidden="true" className="pointer-events-none select-none absolute -top-6 -left-4 md:-left-10 font-brand text-[18rem] md:text-[26rem] leading-none text-dorado/10">L</span>
+        <div className="relative">
+          <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-5">Peluquería y estética · Ripagaina, Pamplona</p>
+          <h1 className="font-serif text-5xl md:text-6xl leading-[1.05] mb-6">
+            Tu momento<br />para <em className="text-dorado-oscuro">brillar</em>
+          </h1>
+          <p className="text-neutral-600 text-lg leading-relaxed max-w-md mb-10">
+            Un espacio cercano donde cuidamos tu cabello, tu piel y tu mirada con productos profesionales y mucho mimo.
+          </p>
+          <div className="flex flex-wrap gap-4 mb-10">
+            <a href={salon.booksy} target="_blank" rel="noopener noreferrer" className="bg-neutral-900 text-white text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado-oscuro transition-colors">
+              Reservar cita
+            </a>
+            <a href="#asistente" className="border border-neutral-900 text-sm uppercase tracking-widest px-8 py-4 hover:bg-neutral-900 hover:text-white transition-colors">
+              ¿Qué necesito?
+            </a>
           </div>
-
-          {error ? (
-            <p className="text-neutral-500">No se han podido cargar los servicios. Intentalo de nuevo mas tarde.</p>
-          ) : servicios.length === 0 ? (
-            <p className="text-neutral-500">Proximamente publicaremos nuestro catalogo de servicios.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-14">
-              {servicios.map((servicio, index) => (
-                <div key={servicio.id} className="border-t border-neutral-200 pt-6">
-                  <span className="text-xs text-neutral-400 tabular-nums">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="text-lg font-light mt-2 mb-3">{servicio.nombre}</h3>
-                  <p className="text-sm text-neutral-600 leading-relaxed">{servicio.descripcion}</p>
-                  {(servicio.precio !== null || servicio.duracion_min !== null) && (
-                    <p className="mt-4 text-sm text-neutral-900 tabular-nums">
-                      {[
-                        servicio.precio !== null && euros.format(servicio.precio),
-                        servicio.duracion_min !== null && `${servicio.duracion_min} min`,
-                      ].filter(Boolean).join(" · ")}
-                    </p>
-                  )}
-                </div>
-              ))}
+          <div className="mb-8">
+            <AbiertoAhora />
+          </div>
+          <div className="flex gap-8 text-sm">
+            <div>
+              <p className="font-serif text-3xl">{salon.opiniones.google.nota} <span className="text-dorado">★</span></p>
+              <p className="text-neutral-500">{salon.opiniones.google.total} opiniones en Google</p>
             </div>
-          )}
+            <div className="w-px bg-[#E0D3C2]" />
+            <div>
+              <p className="font-serif text-3xl">{salon.opiniones.booksy.nota} <span className="text-dorado">★</span></p>
+              <p className="text-neutral-500">{salon.opiniones.booksy.total} opiniones en Booksy</p>
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <div aria-hidden="true" className="absolute inset-0 translate-x-4 -translate-y-4 rounded-t-full border border-dorado" />
+          <FotoPendiente texto="interior del salón" className="relative aspect-[4/5] rounded-t-full" />
         </div>
       </section>
 
-      <section id="reservas" className="px-8 py-24 text-center">
-        <h2 className="text-3xl font-light mb-6">Reserva tu cita</h2>
-        <p className="text-neutral-500 max-w-md mx-auto mb-10">Elige el servicio y el horario que mejor te convenga.</p>
-        
-          <a href="https://booksy.com/es-es/17203_laksmir-beauty_peluqueria_54309_sarriguren"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-neutral-900 text-white px-8 py-3 text-sm uppercase tracking-wide hover:bg-neutral-700 transition-colors"
-        >
-          Ver disponibilidad
+      {/* Categorías */}
+      <section className="bg-white py-20 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
+          <TituloSeccion antetitulo="Lo que hacemos" titulo="Nuestros servicios" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {categorias.map((c, i) => (
+              <Link key={c.slug} href={`/servicios/${c.slug}`} className={`group ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+                <div className={`relative bg-gradient-to-br ${c.tono} ${i === 0 ? "aspect-square" : "aspect-[4/3]"} mb-3 transition-transform group-hover:-translate-y-1`}>
+                  <div className="absolute inset-3 border border-white/70 transition-colors group-hover:border-dorado" />
+                </div>
+                <h3 className={`font-serif ${i === 0 ? "text-2xl" : "text-lg"} group-hover:text-dorado-oscuro transition-colors`}>{c.nombre}</h3>
+                <p className="text-xs uppercase tracking-wider text-neutral-500">{c.servicios} servicios →</p>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link href="/servicios" className="inline-block border border-neutral-900 text-sm uppercase tracking-widest px-8 py-4 hover:bg-neutral-900 hover:text-white transition-colors">
+              Ver todos los servicios
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Asistente */}
+      <section id="asistente" className="scroll-mt-24 px-4 md:px-8 py-20">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">Asistente con inteligencia artificial</p>
+            <h2 className="font-serif text-3xl md:text-4xl mb-4">¿No sabes qué elegir? Pregúntanos</h2>
+            <p className="text-neutral-600 mb-6">
+              Nuestra asistente conoce todos nuestros servicios y responde a cualquier hora. Cuéntale qué buscas o toca una de las preguntas y te recomendará lo mejor para ti.
+            </p>
+            <ul className="space-y-2 text-sm text-neutral-700">
+              {["Qué incluye y cuánto dura cada servicio", "Recomendaciones según tu piel y tu cabello", "Packs para novias y eventos", "Te lleva directa a reservar"].map((t) => (
+                <li key={t} className="flex gap-3"><span className="text-dorado" aria-hidden="true">◆</span>{t}</li>
+              ))}
+            </ul>
+          </div>
+          <AsistentePortada />
+        </div>
+      </section>
+
+      {/* Servicios destacados */}
+      <section className="bg-white py-20 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
+          <TituloSeccion antetitulo="Los más pedidos" titulo="Servicios destacados" />
+          <div className="grid md:grid-cols-3 gap-6">
+            {destacados.map((s) => (
+              <article key={s.nombre} className="relative bg-crema border border-[#EDE3D6] flex flex-col">
+                <Esquinas />
+                <FotoPendiente texto={s.nombre.toLowerCase()} className="aspect-[3/2]" />
+                <div className="p-6 flex flex-col flex-1">
+                  <p className="text-[11px] uppercase tracking-widest text-dorado-oscuro mb-2">{s.categoria}</p>
+                  <h3 className="font-serif text-xl mb-2">{s.nombre}</h3>
+                  <p className="text-sm text-neutral-600 leading-relaxed mb-6 flex-1">{s.descripcion}</p>
+                  <div className="flex items-center justify-between border-t border-linea pt-4">
+                    <p className="text-xs uppercase tracking-wider text-neutral-500">{s.duracion}</p>
+                    <a href={salon.booksy} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-widest border-b border-neutral-900 pb-0.5 hover:text-dorado-oscuro hover:border-dorado-oscuro">
+                      Reservar
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Antes / después */}
+      <section className="px-4 md:px-8 py-20">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+          <AntesDespues titulo="Mechas balayage" />
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">Resultados reales</p>
+            <h2 className="font-serif text-3xl md:text-4xl mb-4">Desliza y descubre el cambio</h2>
+            <p className="text-neutral-600 mb-8">Arrastra la barra para comparar el antes y el después de nuestros trabajos de color, alisado y tratamientos faciales.</p>
+            <Link href="/galeria" className="text-sm uppercase tracking-widest border-b border-neutral-900 pb-1 hover:text-dorado-oscuro hover:border-dorado-oscuro">Ver la galería</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Equipo */}
+      <section className="bg-white py-20 px-4 md:px-8">
+        <div className="max-w-5xl mx-auto">
+          <TituloSeccion antetitulo="Quiénes somos" titulo="Nuestro equipo" />
+          <p className="text-center text-neutral-600 max-w-2xl mx-auto -mt-4 mb-14">
+            Tres profesionales que se forman continuamente y trabajan con productos y aparatología de uso profesional. Te asesoramos con sinceridad y solo te recomendamos lo que de verdad necesitas.
+          </p>
+          <div className="grid md:grid-cols-3 gap-8 md:gap-6 items-center">
+            {equipo.map((p) => <TarjetaProfesional key={p.nombre} p={p} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* Novias */}
+      <section className="bg-neutral-900 text-white">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2">
+          <FotoPendiente texto="novia peinada y maquillada" className="aspect-[4/3] md:aspect-auto md:min-h-[420px]" />
+          <div className="relative px-8 md:px-14 py-16 flex flex-col justify-center">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-5 border border-dorado/40" />
+            <p className="text-xs uppercase tracking-[0.3em] text-dorado mb-3">Bodas y eventos</p>
+            <h2 className="font-serif text-4xl mb-5">Novias Laksmir</h2>
+            <p className="text-neutral-300 leading-relaxed mb-8">Peinado, maquillaje, manicura y tratamientos previos a la boda. Te acompañamos desde la prueba hasta el gran día.</p>
+            <Link href="/novias" className="self-start border border-dorado text-dorado text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado hover:text-neutral-900 transition-colors">
+              Calcula tu pack de novia
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Tarjeta regalo */}
+      <section className="px-4 md:px-8 py-20 text-center">
+        <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">El regalo perfecto</p>
+        <h2 className="font-serif text-3xl md:text-4xl mb-4">Regala un momento Laksmir</h2>
+        <p className="text-neutral-600 max-w-md mx-auto mb-8">Tarjetas regalo para cualquier servicio. Cómpralas en Booksy en un minuto.</p>
+        <a href={salon.booksy} target="_blank" rel="noopener noreferrer" className="inline-block bg-neutral-900 text-white text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado-oscuro transition-colors">
+          Comprar tarjeta regalo
         </a>
       </section>
-
-      <footer id="contacto" className="px-8 py-16 border-t border-neutral-100">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-neutral-500">
-          <div>
-            <h3 className="font-brand text-xl text-neutral-900 mb-3">Laksmir</h3>
-            <p>Beauty Salon</p>
-          </div>
-          <div>
-            <h4 className="text-xs uppercase tracking-widest text-neutral-400 mb-3">Direccion</h4>
-            <p>Calle la Valeta 1</p>
-            <p>Valle de Egues, Navarra</p>
-          </div>
-          <div>
-            <h4 className="text-xs uppercase tracking-widest text-neutral-400 mb-3">Contacto</h4>
-            <p>+34 948 042 190</p>
-          </div>
-        </div>
-        <p className="max-w-5xl mx-auto mt-10 pt-6 border-t border-neutral-100 text-xs text-neutral-400">
-          Copyright 2026 Laksmir Beauty Salon. Todos los derechos reservados.
-        </p>
-      </footer>
-    </main>
+    </>
   );
 }

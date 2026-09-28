@@ -1,6 +1,6 @@
 # Laksmir Beauty Salon
 
-Web para Laksmir Beauty Salon, una peluquería y centro de estética en Sarriguren (Navarra).
+Web para Laksmir Beauty Salon, una peluquería y centro de estética en Ripagaina (Navarra).
 
 Es un proyecto real: la web la usa el salón para enseñar sus servicios y mandar a los clientes a reservar cita en Booksy. Además tiene un panel privado para que la dueña pueda añadir, cambiar u ocultar servicios sin tocar código.
 

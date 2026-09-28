@@ -35,7 +35,7 @@ export default function MantenimientoPage() {
       </div>
 
       <div className="text-sm text-neutral-500 space-y-1">
-        <p>Calle la Valeta 1, Sarriguren (Navarra)</p>
+        <p>Calle la Valeta 1, Ripagaina (Navarra)</p>
         <p>
           <a href="https://www.instagram.com/laksmirbeauty/" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 underline underline-offset-4">
             @laksmirbeauty
