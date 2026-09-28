@@ -2,11 +2,12 @@
 // Los servicios se leen de la base de datos, así que si Carla cambia un servicio en el panel,
 // la asistente lo sabe al momento.
 import "server-only";
-import { categoriaDeOrden, categorias, duracionBonita, nombreBonito } from "../categorias";
+import { categorias, duracionBonita, nombreBonito } from "../categorias";
 import { equipo } from "../equipo";
 import { packs } from "../novias";
 import { salon } from "../salon";
 import { listarServiciosActivos } from "../servicios";
+import { sinPrecios } from "../texto";
 
 // Botones que la asistente puede poner debajo de su respuesta. Solo estos: así nunca inventa enlaces.
 export const enlacesPermitidos: Record<string, { texto: string; href: string }> = {
@@ -20,22 +21,13 @@ export const enlacesPermitidos: Record<string, { texto: string; href: string }> 
   ...Object.fromEntries(categorias.map((c) => [c.slug, { texto: c.nombre, href: `/servicios/${c.slug}` }])),
 };
 
-// Quita de las descripciones de Booksy cualquier frase que hable de dinero (la web no da precios)
-function sinPrecios(texto: string) {
-  return texto
-    .split(/(?<=[.!?])\s+|\n+/)
-    .filter((frase) => !/€|euro|precio|gratuit|suplemento/i.test(frase))
-    .join(" ")
-    .trim();
-}
-
 export async function crearInstrucciones(): Promise<string> {
   const servicios = await listarServiciosActivos();
 
   const catalogo = categorias
     .map((c) => {
       const lista = servicios
-        .filter((s) => categoriaDeOrden(s.orden)?.slug === c.slug)
+        .filter((s) => s.categoria === c.slug)
         .map((s) => {
           const detalles = [duracionBonita(s.duracion_min), sinPrecios(s.descripcion)].filter(Boolean).join(". ");
           return `  - ${nombreBonito(s.nombre)}${detalles ? `: ${detalles}` : ""}`;

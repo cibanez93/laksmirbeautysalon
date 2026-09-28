@@ -9,12 +9,10 @@ import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import { createSession, deleteSession, requireSession } from "@/lib/session";
 import * as servicios from "@/lib/servicios";
+import { comprobarId, valoresDe } from "./utilidades";
 
 // "valores" devuelve lo que se escribió, para no vaciar el formulario si hay un error
 export type EstadoFormulario = { error?: string; valores?: Record<string, string> } | undefined;
-
-const valoresDe = (formData: FormData) =>
-  Object.fromEntries([...formData].filter(([k, v]) => !k.startsWith("$") && typeof v === "string")) as Record<string, string>;
 
 // ---------------------------------------------------------------- Login
 
@@ -50,7 +48,7 @@ export async function logout() {
 function leerFormulario(formData: FormData): servicios.DatosServicio | string {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const descripcion = String(formData.get("descripcion") ?? "").trim();
-  const precioTxt = String(formData.get("precio") ?? "").trim().replace(",", ".");
+  const categoriaTxt = String(formData.get("categoria_id") ?? "").trim();
   const duracionTxt = String(formData.get("duracion_min") ?? "").trim();
   const ordenTxt = String(formData.get("orden") ?? "").trim();
 
@@ -58,10 +56,8 @@ function leerFormulario(formData: FormData): servicios.DatosServicio | string {
   if (nombre.length > 100) return "El nombre no puede tener más de 100 caracteres.";
   if (!descripcion) return "La descripción es obligatoria.";
 
-  const precio = precioTxt === "" ? null : Number(precioTxt);
-  if (precio !== null && (!Number.isFinite(precio) || precio < 0 || precio > 9999)) {
-    return "El precio debe ser un número entre 0 y 9999.";
-  }
+  const categoria_id = Number(categoriaTxt);
+  if (!Number.isInteger(categoria_id) || categoria_id <= 0) return "Elige una categoría.";
 
   const duracion_min = duracionTxt === "" ? null : Number(duracionTxt);
   if (duracion_min !== null && (!Number.isInteger(duracion_min) || duracion_min <= 0 || duracion_min > 1440)) {
@@ -71,19 +67,12 @@ function leerFormulario(formData: FormData): servicios.DatosServicio | string {
   const orden = ordenTxt === "" ? 0 : Number(ordenTxt);
   if (!Number.isInteger(orden)) return "El orden debe ser un número entero.";
 
-  return { nombre, descripcion, precio, duracion_min, orden, activo: formData.get("activo") === "on" };
-}
-
-// Los argumentos llegan del navegador y se pueden manipular: comprobamos que el id es válido
-function comprobarId(id: unknown): number {
-  if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) throw new Error("Id no válido");
-  return id;
+  return { categoria_id, nombre, descripcion, duracion_min, orden, activo: formData.get("activo") === "on" };
 }
 
 // Después de cambiar algo, pedimos a Next que regenere la web y el panel
 function refrescar() {
-  revalidatePath("/");
-  revalidatePath("/admin");
+  revalidatePath("/", "layout");
 }
 
 export async function crearServicio(_prev: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {

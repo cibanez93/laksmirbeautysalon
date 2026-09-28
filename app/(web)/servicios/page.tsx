@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import AbrirAsistente from "@/components/web/chat/AbrirAsistente";
 import { TituloSeccion } from "@/components/web/decoracion";
-import { categoriaDeOrden, categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
+import { categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
+import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import { listarServiciosActivos } from "@/lib/servicios";
 import ListaServicios, { type GrupoServicios } from "./ListaServicios";
 
@@ -15,12 +16,13 @@ export const metadata: Metadata = {
 async function getGrupos(): Promise<GrupoServicios[] | null> {
   await connection(); // se lee la base de datos en cada visita
   try {
-    const servicios = await listarServiciosActivos();
+    const [servicios, destacados] = await Promise.all([listarServiciosActivos(), obtenerDestacadosSeguro()]);
     return categorias
       .map((c) => ({
         categoria: c,
+        fotoId: destacados[`categoria-${c.slug}`]?.foto_id ?? null,
         servicios: servicios
-          .filter((s) => categoriaDeOrden(s.orden)?.slug === c.slug)
+          .filter((s) => s.categoria === c.slug)
           .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min) })),
       }))
       .filter((g) => g.servicios.length > 0);

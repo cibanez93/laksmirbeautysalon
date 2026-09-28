@@ -4,11 +4,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { Adorno, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { Adorno, FotoDestacada, TituloSeccion } from "@/components/web/decoracion";
 import AbrirAsistente from "@/components/web/chat/AbrirAsistente";
 import ServicioFila from "@/components/web/ServicioFila";
 import TarjetaProfesional from "@/components/web/TarjetaProfesional";
-import { categoriaDeOrden, categoriaPorSlug, categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
+import { categoriaPorSlug, categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
+import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import { equipoDe } from "@/lib/equipo";
 import { salon } from "@/lib/salon";
 import { listarServiciosActivos } from "@/lib/servicios";
@@ -27,7 +28,7 @@ async function getServicios(slug: string) {
   try {
     const servicios = await listarServiciosActivos();
     return servicios
-      .filter((s) => categoriaDeOrden(s.orden)?.slug === slug)
+      .filter((s) => s.categoria === slug)
       .map((s) => ({ id: s.id, nombre: nombreBonito(s.nombre), descripcion: s.descripcion, duracion: duracionBonita(s.duracion_min) }));
   } catch (error) {
     console.error("Error al traer los servicios:", error);
@@ -40,6 +41,7 @@ export default async function CategoriaPage({ params }: PageProps<"/servicios/[c
   if (!categoria) notFound();
 
   const servicios = await getServicios(categoria.slug);
+  const d = await obtenerDestacadosSeguro();
   const profesionales = equipoDe(categoria.slug);
   const otras = categorias.filter((c) => c.slug !== categoria.slug);
 
@@ -80,7 +82,7 @@ export default async function CategoriaPage({ params }: PageProps<"/servicios/[c
         </div>
         <div className="relative">
           <div aria-hidden="true" className="absolute inset-0 translate-x-4 -translate-y-4 rounded-t-full border border-dorado" />
-          <FotoPendiente texto={categoria.nombre.toLowerCase()} className="relative aspect-[4/5] rounded-t-full" />
+          <FotoDestacada id={d[`categoria-${categoria.slug}`]?.foto_id} texto={categoria.nombre} className="relative aspect-[4/5] rounded-t-full" />
         </div>
       </section>
 
@@ -106,7 +108,7 @@ export default async function CategoriaPage({ params }: PageProps<"/servicios/[c
           <div className="max-w-5xl mx-auto">
             <TituloSeccion antetitulo="Quién te atiende" titulo="Profesionales a tu cuidado" />
             <div className={`grid gap-8 md:gap-6 ${profesionales.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-3xl mx-auto"}`}>
-              {profesionales.map((p) => <TarjetaProfesional key={p.nombre} p={p} destacar={false} />)}
+              {profesionales.map((p) => <TarjetaProfesional key={p.nombre} p={p} destacar={false} fotoId={d[`equipo-${p.nombre.toLowerCase()}`]?.foto_id} />)}
             </div>
           </div>
         </section>

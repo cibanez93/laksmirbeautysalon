@@ -1,6 +1,5 @@
-// Fotos de la galería.
-// PROVISIONAL: datos de ejemplo. Cuando exista la tabla "fotos" en MySQL, Carla las subirá
-// desde el panel y se leerán de la base de datos.
+// Fotos de EJEMPLO para la galería. Solo se ven mientras no haya fotos reales
+// subidas desde el panel (tabla "fotos" de la base de datos).
 
 export interface AntesDespuesItem {
   titulo: string;

@@ -1,7 +1,9 @@
 // Página de NOVIAS: packs cerrados (sin precio), calendario, invitadas, galería y preguntas.
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Adorno, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { connection } from "next/server";
+import { Adorno, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import { calendario, packs, preguntasNovias } from "@/lib/novias";
 import EligePack from "./EligePack";
 
@@ -16,7 +18,10 @@ const datosGoogle = {
   mainEntity: preguntasNovias.map((p) => ({ "@type": "Question", name: p.pregunta, acceptedAnswer: { "@type": "Answer", text: p.respuesta } })),
 };
 
-export default function NoviasPage() {
+export default async function NoviasPage() {
+  await connection();
+  const d = await obtenerDestacadosSeguro();
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosGoogle) }} />
@@ -36,7 +41,7 @@ export default function NoviasPage() {
               <a href="#pedir-info" className="border border-dorado text-dorado text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado hover:text-neutral-900 transition-colors">Pedir información</a>
             </div>
           </div>
-          <FotoPendiente texto="novia peinada y maquillada" className="aspect-[4/3] md:aspect-auto md:min-h-[560px] order-1 md:order-2" />
+          <FotoDestacada id={d.novias?.foto_id} texto="Novia peinada y maquillada" className="aspect-[4/3] md:aspect-auto md:min-h-[560px] order-1 md:order-2" />
         </div>
       </section>
 

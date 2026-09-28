@@ -2,13 +2,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Adorno } from "@/components/web/decoracion";
-import { articuloPorSlug, articulos, categoriaBlog, fechaBonita, minutosLectura } from "@/lib/blog";
+import { listarPublicados, obtenerPublicado } from "@/lib/articulos";
+import { fechaBonita, minutosLectura, temaBlog } from "@/lib/blog";
 import { categoriaPorSlug } from "@/lib/categorias";
 import { salon } from "@/lib/salon";
 
+// Si la base de datos falla, la página se comporta como si el artículo no existiera
+const buscar = (slug: string) => obtenerPublicado(slug).catch(() => null);
+
 export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): Promise<Metadata> {
-  const articulo = articuloPorSlug((await params).slug);
+  const articulo = await buscar((await params).slug);
   if (!articulo) return {};
   return { title: `${articulo.titulo} | Blog de Laksmir Beauty Salon`, description: articulo.resumen };
 }
@@ -37,12 +42,13 @@ function Contenido({ texto }: { texto: string }) {
 }
 
 export default async function ArticuloPage({ params }: PageProps<"/blog/[slug]">) {
-  const articulo = articuloPorSlug((await params).slug);
+  await connection();
+  const articulo = await buscar((await params).slug);
   if (!articulo) notFound();
 
-  const categoria = categoriaBlog(articulo.categoria);
-  const servicio = categoria ? categoriaPorSlug(categoria.servicio) : undefined;
-  const otros = articulos.filter((a) => a.slug !== articulo.slug).slice(0, 2);
+  const tema = temaBlog(articulo.tema);
+  const servicio = tema ? categoriaPorSlug(tema.servicio) : undefined;
+  const otros = (await listarPublicados().catch(() => [])).filter((a) => a.slug !== articulo.slug).slice(0, 2);
 
   // Datos para Google: así entiende que es un artículo, quién lo escribe y cuándo
   const datosGoogle = {
@@ -62,12 +68,9 @@ export default async function ArticuloPage({ params }: PageProps<"/blog/[slug]">
         <nav aria-label="Estás en" className="text-xs uppercase tracking-wider text-neutral-500 mb-10">
           <Link href="/blog" className="hover:text-dorado-oscuro">Blog</Link>
           <span className="mx-2 text-dorado">/</span>
-          <span className="text-neutral-800">{categoria?.nombre}</span>
+          <span className="text-neutral-800">{tema?.nombre}</span>
         </nav>
 
-        {articulo.ejemplo && (
-          <p className="mb-6 inline-block bg-dorado/15 text-dorado-oscuro text-xs uppercase tracking-wider px-3 py-1">Artículo de ejemplo</p>
-        )}
         <h1 className="font-serif text-4xl md:text-5xl leading-tight mb-6">{articulo.titulo}</h1>
         <p className="text-xl text-neutral-600 leading-relaxed mb-8">{articulo.resumen}</p>
         <p className="text-xs uppercase tracking-widest text-neutral-500">

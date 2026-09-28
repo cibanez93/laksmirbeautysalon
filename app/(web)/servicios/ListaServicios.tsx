@@ -2,7 +2,7 @@
 // Lista de servicios con buscador. Es un componente de cliente porque el buscador
 // filtra mientras escribes, sin recargar la página.
 import { useState } from "react";
-import { Adorno, FotoPendiente } from "@/components/web/decoracion";
+import { Adorno, FotoDestacada } from "@/components/web/decoracion";
 import Link from "next/link";
 import ServicioFila, { type ServicioLista } from "@/components/web/ServicioFila";
 import type { Categoria } from "@/lib/categorias";
@@ -11,6 +11,7 @@ import { salon } from "@/lib/salon";
 
 export interface GrupoServicios {
   categoria: Categoria;
+  fotoId: number | null;
   servicios: ServicioLista[];
 }
 
@@ -71,7 +72,7 @@ export default function ListaServicios({ grupos }: { grupos: GrupoServicios[] })
           <section key={g.categoria.slug} id={g.categoria.slug} className="scroll-mt-48" aria-labelledby={`t-${g.categoria.slug}`}>
             {/* Cabecera de la sección: foto + título */}
             <div className="grid sm:grid-cols-[180px_1fr] gap-6 items-center mb-8">
-              <FotoPendiente texto={g.categoria.nombre.toLowerCase()} className="hidden sm:block aspect-square rounded-t-full" />
+              <FotoDestacada id={g.fotoId} texto={g.categoria.nombre} className="hidden sm:block aspect-square rounded-t-full" />
               <div>
                 <h2 id={`t-${g.categoria.slug}`} className="font-serif text-3xl md:text-4xl mb-2">{g.categoria.nombre}</h2>
                 <p className="text-neutral-600">{g.categoria.intro}</p>

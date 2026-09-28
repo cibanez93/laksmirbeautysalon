@@ -2,9 +2,9 @@
 // Con destacar={false} todas las tarjetas salen iguales, sin la etiqueta de fundadora.
 import type { Profesional } from "@/lib/equipo";
 import { salon } from "@/lib/salon";
-import { Adorno, FotoPendiente } from "./decoracion";
+import { Adorno, FotoDestacada } from "./decoracion";
 
-export default function TarjetaProfesional({ p: profesional, destacar = true }: { p: Profesional; destacar?: boolean }) {
+export default function TarjetaProfesional({ p: profesional, destacar = true, fotoId }: { p: Profesional; destacar?: boolean; fotoId?: number | null }) {
   const p = { ...profesional, fundadora: destacar && profesional.fundadora };
   return (
     <article
@@ -13,7 +13,7 @@ export default function TarjetaProfesional({ p: profesional, destacar = true }: 
       {p.fundadora && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-dorado text-white text-[10px] uppercase tracking-[0.25em] px-3 py-1">Fundadora</span>
       )}
-      <FotoPendiente texto={p.nombre.toLowerCase()} className={`mx-auto rounded-t-full aspect-[3/4] ${p.fundadora ? "w-44 md:w-48" : "w-36 md:w-40"}`} />
+      <FotoDestacada id={fotoId} texto={p.nombre} className={`mx-auto rounded-t-full aspect-[3/4] ${p.fundadora ? "w-44 md:w-48" : "w-36 md:w-40"}`} />
       <h3 className={`font-serif mt-6 ${p.fundadora ? "text-3xl" : "text-2xl"}`}>{p.nombre}</h3>
       <p className="text-[11px] uppercase tracking-[0.25em] text-dorado-oscuro mt-1">{p.cargo}</p>
       <Adorno className="my-4" />

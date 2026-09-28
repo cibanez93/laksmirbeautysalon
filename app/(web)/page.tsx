@@ -1,14 +1,19 @@
 // Página de INICIO
-// Fase de diseño: las fotos son huecos de ejemplo y algunos datos están escritos a mano.
-// Cuando existan las tablas de categorías y galería, se leerán de la base de datos.
+// Las fotos y los servicios destacados se eligen en el panel (Destacados); si no hay ninguno
+// elegido, se ven los de ejemplo. El antes/después es el más reciente de la galería.
 import Link from "next/link";
+import { connection } from "next/server";
 import AbiertoAhora from "@/components/web/AbiertoAhora";
 import AntesDespues from "@/components/web/AntesDespues";
 import AsistentePortada from "@/components/web/chat/AsistentePortada";
-import { Esquinas, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { Esquinas, FotoDestacada, TituloSeccion } from "@/components/web/decoracion";
 import TarjetaProfesional from "@/components/web/TarjetaProfesional";
+import { duracionBonita, nombreBonito } from "@/lib/categorias";
+import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import { equipo } from "@/lib/equipo";
+import { listarFotos, urlFoto, urlFotoAntes } from "@/lib/fotos";
 import { salon } from "@/lib/salon";
+import { sinPrecios } from "@/lib/texto";
 
 const categorias = [
   { nombre: "Peluquería", slug: "peluqueria", servicios: 18, tono: "from-[#E9DCCB] to-[#D8C3A8]" },
@@ -21,7 +26,8 @@ const categorias = [
   { nombre: "Maquillaje", slug: "maquillaje", servicios: 2, tono: "from-[#F0E2D7] to-[#DDC3B0]" },
 ];
 
-const destacados = [
+// Servicios destacados de ejemplo: se usan mientras no se elijan otros en el panel (Destacados)
+const destacadosEjemplo = [
   { nombre: "Experiencia Brûlée", categoria: "Peluquería", descripcion: "Diagnóstico capilar, diseño del color, balayage premium y tratamiento reparador.", duracion: "5 h" },
   { nombre: "Limpieza facial profunda", categoria: "Tratamientos faciales", descripcion: "Purifica y oxigena la piel con tecnología profesional y oxígeno puro.", duracion: "60 min" },
   { nombre: "Balayage", categoria: "Peluquería", descripcion: "Mechas a mano alzada con un degradado suave y natural, diseñadas a medida para iluminar tu melena.", duracion: "3 h 30 min" },
@@ -52,7 +58,34 @@ const datosGoogle = {
   sameAs: [salon.instagram.url, salon.booksy],
 };
 
-export default function InicioPage() {
+// El antes/después más reciente subido desde el panel (o uno de ejemplo si no hay)
+async function AntesDespuesPortada() {
+  await connection();
+  const ultima = await listarFotos({ soloVisibles: true })
+    .then((lista) => lista.find((f) => f.tipo === "antes_despues"))
+    .catch((error) => {
+      console.error("Error al traer el antes/después:", error);
+      return undefined;
+    });
+  if (!ultima) return <AntesDespues titulo="Mechas balayage" />;
+  return <AntesDespues titulo={ultima.titulo} antes={urlFotoAntes(ultima.id)} despues={urlFoto(ultima.id)} />;
+}
+
+// Recorta un texto largo a unas 140 letras sin cortar palabras
+const recortar = (t: string) => (t.length <= 140 ? t : `${t.slice(0, 140).replace(/\s+\S*$/, "")}…`);
+
+export default async function InicioPage() {
+  await connection();
+  const d = await obtenerDestacadosSeguro();
+  const destacados = destacadosEjemplo.map((ejemplo, i) => {
+    const elegido = d[`destacado-${i + 1}`];
+    const s = elegido?.servicio;
+    const datos = s
+      ? { nombre: nombreBonito(s.nombre), categoria: s.categoria ?? "", descripcion: recortar(sinPrecios(s.descripcion)), duracion: duracionBonita(s.duracion_min) ?? "" }
+      : ejemplo;
+    return { ...datos, clave: `destacado-${i + 1}`, fotoId: elegido?.foto_id };
+  });
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosGoogle) }} />
@@ -93,7 +126,7 @@ export default function InicioPage() {
         </div>
         <div className="relative">
           <div aria-hidden="true" className="absolute inset-0 translate-x-4 -translate-y-4 rounded-t-full border border-dorado" />
-          <FotoPendiente texto="interior del salón" className="relative aspect-[4/5] rounded-t-full" />
+          <FotoDestacada id={d.portada?.foto_id} texto="Interior del salón" className="relative aspect-[4/5] rounded-t-full" />
         </div>
       </section>
 
@@ -105,6 +138,11 @@ export default function InicioPage() {
             {categorias.map((c, i) => (
               <Link key={c.slug} href={`/servicios/${c.slug}`} className={`group ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
                 <div className={`relative bg-gradient-to-br ${c.tono} ${i === 0 ? "aspect-square" : "aspect-[4/3]"} mb-3 transition-transform group-hover:-translate-y-1`}>
+                  {d[`categoria-${c.slug}`]?.foto_id && (
+                    <div className="absolute inset-0">
+                      <FotoDestacada id={d[`categoria-${c.slug}`].foto_id} texto={c.nombre} className="h-full" />
+                    </div>
+                  )}
                   <div className="absolute inset-3 border border-white/70 transition-colors group-hover:border-dorado" />
                 </div>
                 <h3 className={`font-serif ${i === 0 ? "text-2xl" : "text-lg"} group-hover:text-dorado-oscuro transition-colors`}>{c.nombre}</h3>
@@ -145,9 +183,9 @@ export default function InicioPage() {
           <TituloSeccion antetitulo="Los más pedidos" titulo="Servicios destacados" />
           <div className="grid md:grid-cols-3 gap-6">
             {destacados.map((s) => (
-              <article key={s.nombre} className="relative bg-crema border border-[#EDE3D6] flex flex-col">
+              <article key={s.clave} className="relative bg-crema border border-[#EDE3D6] flex flex-col">
                 <Esquinas />
-                <FotoPendiente texto={s.nombre.toLowerCase()} className="aspect-[3/2]" />
+                <FotoDestacada id={s.fotoId} texto={s.nombre} className="aspect-[3/2]" />
                 <div className="p-6 flex flex-col flex-1">
                   <p className="text-[11px] uppercase tracking-widest text-dorado-oscuro mb-2">{s.categoria}</p>
                   <h3 className="font-serif text-xl mb-2">{s.nombre}</h3>
@@ -168,7 +206,7 @@ export default function InicioPage() {
       {/* Antes / después */}
       <section className="px-4 md:px-8 py-20">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-          <AntesDespues titulo="Mechas balayage" />
+          <AntesDespuesPortada />
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">Resultados reales</p>
             <h2 className="font-serif text-3xl md:text-4xl mb-4">Desliza y descubre el cambio</h2>
@@ -186,7 +224,7 @@ export default function InicioPage() {
             Tres profesionales que se forman continuamente y trabajan con productos y aparatología de uso profesional. Te asesoramos con sinceridad y solo te recomendamos lo que de verdad necesitas.
           </p>
           <div className="grid md:grid-cols-3 gap-8 md:gap-6 items-center">
-            {equipo.map((p) => <TarjetaProfesional key={p.nombre} p={p} />)}
+            {equipo.map((p) => <TarjetaProfesional key={p.nombre} p={p} fotoId={d[`equipo-${p.nombre.toLowerCase()}`]?.foto_id} />)}
           </div>
         </div>
       </section>
@@ -194,7 +232,7 @@ export default function InicioPage() {
       {/* Novias */}
       <section className="bg-neutral-900 text-white">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2">
-          <FotoPendiente texto="novia peinada y maquillada" className="aspect-[4/3] md:aspect-auto md:min-h-[420px]" />
+          <FotoDestacada id={d.novias?.foto_id} texto="Novia peinada y maquillada" className="aspect-[4/3] md:aspect-auto md:min-h-[420px]" />
           <div className="relative px-8 md:px-14 py-16 flex flex-col justify-center">
             <div aria-hidden="true" className="pointer-events-none absolute inset-5 border border-dorado/40" />
             <p className="text-xs uppercase tracking-[0.3em] text-dorado mb-3">Bodas y eventos</p>

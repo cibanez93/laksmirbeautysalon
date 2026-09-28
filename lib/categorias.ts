@@ -1,7 +1,6 @@
-// Categorías de servicios.
-// PROVISIONAL: de momento la categoría se deduce de la columna "orden" (100 = Peluquería,
-// 200 = Faciales...). Cuando creemos la tabla "categorias" en MySQL, esto se leerá de ahí.
-// El orden de esta lista es el orden en que salen en la web.
+// Textos de cada categoría de servicios (presentación y preguntas frecuentes).
+// Qué categoría tiene cada servicio se guarda en la base de datos (tabla "categorias");
+// aquí están los textos de la web, buscados por el slug. El orden de esta lista es el de la web.
 //
 // BORRADOR: los textos de presentación y las respuestas de las preguntas frecuentes
 // tiene que revisarlos Carla antes de publicar la web.
@@ -17,7 +16,6 @@ export interface Categoria {
   intro: string;
   presentacion: string;
   preguntas: Pregunta[];
-  centena: number;
 }
 
 const reservar: Pregunta = {
@@ -27,7 +25,6 @@ const reservar: Pregunta = {
 
 export const categorias: Categoria[] = [
   {
-    centena: 1,
     slug: "peluqueria",
     nombre: "Peluquería",
     intro: "Cortes, color, mechas y tratamientos capilares pensados para ti.",
@@ -40,7 +37,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 2,
     slug: "tratamientos-faciales",
     nombre: "Tratamientos faciales",
     intro: "Diagnóstico de la piel, limpiezas y tratamientos con aparatología profesional.",
@@ -53,7 +49,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 3,
     slug: "tratamientos-corporales",
     nombre: "Tratamientos corporales",
     intro: "Presoterapia, radiofrecuencia y maderoterapia para sentirte bien en tu piel.",
@@ -65,7 +60,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 4,
     slug: "manicura",
     nombre: "Manicura",
     intro: "Manos cuidadas al detalle, del esmaltado semipermanente al esculpido de uñas.",
@@ -77,7 +71,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 8,
     slug: "pedicura",
     nombre: "Pedicura",
     intro: "Pies cuidados y bonitos, de la pedicura básica al ritual Laksmir.",
@@ -88,7 +81,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 9,
     slug: "depilacion",
     nombre: "Depilación",
     intro: "Depilación con cera para una piel suave.",
@@ -96,7 +88,6 @@ export const categorias: Categoria[] = [
     preguntas: [reservar],
   },
   {
-    centena: 5,
     slug: "maquillaje",
     nombre: "Maquillaje",
     intro: "Maquillaje profesional para novias y cualquier evento especial.",
@@ -107,7 +98,6 @@ export const categorias: Categoria[] = [
     ],
   },
   {
-    centena: 6,
     slug: "masajes",
     nombre: "Masajes",
     intro: "Un rato para desconectar y cuidar tu cuerpo.",
@@ -115,7 +105,6 @@ export const categorias: Categoria[] = [
     preguntas: [reservar],
   },
   {
-    centena: 7,
     slug: "diseno-de-mirada",
     nombre: "Diseño de mirada",
     intro: "Cejas y pestañas que enmarcan tu mirada de forma natural.",
@@ -129,9 +118,6 @@ export const categorias: Categoria[] = [
 
 export const categoriaPorSlug = (slug: string) => categorias.find((c) => c.slug === slug);
 
-export function categoriaDeOrden(orden: number): Categoria | undefined {
-  return categorias.find((c) => c.centena === Math.floor(orden / 100));
-}
 
 // Los nombres de Booksy vienen casi siempre en MAYÚSCULAS. Para la web los pasamos a formato frase:
 // "MECHAS + PEINAR (cabello corto)" -> "Mechas + peinar (cabello corto)".

@@ -6,10 +6,11 @@ import type { EstadoFormulario } from "./actions";
 
 interface Props {
   accion: (prev: EstadoFormulario, formData: FormData) => Promise<EstadoFormulario>;
+  categorias: { id: number; nombre: string }[];
   inicial?: {
+    categoria_id: number | null;
     nombre: string;
     descripcion: string;
-    precio: number | null;
     duracion_min: number | null;
     orden: number;
     activo: boolean;
@@ -17,7 +18,7 @@ interface Props {
   textoBoton: string;
 }
 
-export default function ServicioForm({ accion, inicial, textoBoton }: Props) {
+export default function ServicioForm({ accion, categorias, inicial, textoBoton }: Props) {
   const [estado, enviar, enviando] = useActionState(accion, undefined);
 
   // Si la acción devolvió un error, rellenamos con lo que se había escrito
@@ -37,18 +38,23 @@ export default function ServicioForm({ accion, inicial, textoBoton }: Props) {
         <textarea name="descripcion" required rows={4} defaultValue={valor("descripcion")} className="input" />
       </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <label className="campo">
-          Precio (€)
-          <input name="precio" inputMode="decimal" placeholder="Opcional" defaultValue={valor("precio")} className="input" />
-        </label>
+      <label className="campo">
+        Categoría *
+        <select name="categoria_id" required defaultValue={valor("categoria_id")} className="input">
+          <option value="" disabled>Elige una categoría</option>
+          {categorias.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+        </select>
+      </label>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <label className="campo">
           Duración (min)
           <input name="duracion_min" type="number" min={1} placeholder="Opcional" defaultValue={valor("duracion_min")} className="input" />
         </label>
         <label className="campo">
-          Orden
+          Orden dentro de la categoría
           <input name="orden" type="number" defaultValue={valor("orden") || "0"} className="input" />
+          <span className="normal-case tracking-normal text-neutral-400">Los números más bajos salen primero.</span>
         </label>
       </div>
 

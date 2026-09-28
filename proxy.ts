@@ -20,6 +20,6 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // No toca el panel, los archivos de Next, las imágenes ni las fuentes
-  matcher: ["/((?!admin|_next/|favicon.ico|.*\\.(?:png|jpg|jpeg|webp|svg|ico|otf|ttf|woff2?)$).*)"],
+  // No toca el panel, las fotos de la galería, los archivos de Next, las imágenes ni las fuentes
+  matcher: ["/((?!admin|fotos/|_next/|favicon.ico|.*\\.(?:png|jpg|jpeg|webp|svg|ico|otf|ttf|woff2?)$).*)"],
 };

@@ -2,7 +2,9 @@
 // BORRADOR: la historia y los valores los tiene que revisar Carla.
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Adorno, Esquinas, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { connection } from "next/server";
+import { Adorno, Esquinas, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
+import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import Loto from "@/components/web/Loto";
 import { categorias } from "@/lib/categorias";
 import { equipo } from "@/lib/equipo";
@@ -24,7 +26,9 @@ const valores = [
 
 const marcas = ["Wella Professionals", "SP System Professional", "Casmara", "Kinetics", "Tanino Therapy"];
 
-export default function NosotrasPage() {
+export default async function NosotrasPage() {
+  await connection();
+  const d = await obtenerDestacadosSeguro();
   const años = new Date().getFullYear() - APERTURA;
   const nombreCategoria = (slug: string) => categorias.find((c) => c.slug === slug)?.nombre ?? slug;
 
@@ -34,7 +38,7 @@ export default function NosotrasPage() {
       <section className="relative max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center px-4 md:px-8 py-16 md:py-24">
         <div className="relative order-2 md:order-1">
           <div aria-hidden="true" className="absolute inset-0 -translate-x-4 -translate-y-4 rounded-t-full border border-dorado" />
-          <FotoPendiente texto="el equipo en el salón" className="relative aspect-[4/5] rounded-t-full" />
+          <FotoDestacada id={d.portada?.foto_id} texto="El equipo en el salón" className="relative aspect-[4/5] rounded-t-full" />
           <div className="absolute -bottom-6 -right-2 md:-right-6 bg-white shadow-sm px-6 py-5 border border-linea text-center">
             <p className="font-serif text-4xl text-dorado-oscuro">{APERTURA}</p>
             <p className="text-[11px] uppercase tracking-widest text-neutral-500">Desde entonces en Ripagaina</p>
@@ -122,7 +126,7 @@ export default function NosotrasPage() {
               <article key={p.nombre} className={`grid gap-8 md:gap-14 items-center ${i % 2 ? "md:grid-cols-[3fr_2fr] md:[&>*:first-child]:order-2" : "md:grid-cols-[2fr_3fr]"}`}>
                 <div className="relative">
                   <div aria-hidden="true" className={`absolute inset-0 translate-y-4 rounded-t-full border border-dorado ${i % 2 ? "-translate-x-4" : "translate-x-4"}`} />
-                  <FotoPendiente texto={p.nombre.toLowerCase()} className="relative aspect-[3/4] rounded-t-full" />
+                  <FotoDestacada id={d[`equipo-${p.nombre.toLowerCase()}`]?.foto_id} texto={p.nombre} className="relative aspect-[3/4] rounded-t-full" />
                 </div>
                 <div>
                   {p.fundadora && <span className="inline-block bg-dorado text-white text-[10px] uppercase tracking-[0.25em] px-3 py-1 mb-4">Fundadora</span>}

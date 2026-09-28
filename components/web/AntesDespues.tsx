@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface Props {
-  antes?: string; // ruta de la foto, p. ej. "/galeria/mechas-antes.jpg"
+  antes?: string; // dirección de la foto, p. ej. "/fotos/12/antes"
   despues?: string;
   titulo: string;
   className?: string;
@@ -13,7 +13,7 @@ interface Props {
 
 function Capa({ src, alt, ejemplo }: { src?: string; alt: string; ejemplo: string }) {
   return src ? (
-    <Image src={src} alt={alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
+    <Image src={src} alt={alt} fill unoptimized className="object-cover" />
   ) : (
     <div className={`absolute inset-0 ${ejemplo}`} />
   );

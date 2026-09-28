@@ -105,9 +105,10 @@ _Pendiente: detallar las secciones de cada página._
 **Gestión del contenido**
 | Contenido | Quién lo gestiona | Cómo |
 |---|---|---|
-| Servicios | Mi hermana | Panel de administración (ya funciona). |
-| Galería | Mi hermana | Panel de administración: subir y borrar fotos. Las fotos se guardan en la nube. |
-| Blog | Yo | Mi hermana escribe los artículos y yo los publico desde el panel de administración (se guardan en MySQL). |
+| Servicios | Mi hermana | Panel de administración: crear, editar, ocultar y borrar, con categoría (sin precios). ✅ |
+| Galería | Mi hermana | Panel de administración: subir fotos y antes/después, editar (título, categoría, forma e imagen), ocultar y borrar. Se reducen solas antes de subirlas. ✅ |
+| Fotos destacadas | Mi hermana | Panel → Destacados: qué foto se ve en la portada, en los 3 servicios destacados (y qué servicio), en el equipo, en cada categoría y en novias. ✅ |
+| Blog | Yo | Mi hermana escribe los artículos y yo los publico desde el panel: borrador o publicado, editar y borrar. ✅ |
 
 ## 5. Datos
 
@@ -118,10 +119,11 @@ Qué se guarda en la base de datos (MySQL):
 | `servicios` | Los servicios del salón | Existe (68 servicios de Booksy) |
 | `usuarios` | Quién puede entrar al panel | Existe |
 | `sesiones` | Sesiones abiertas del panel | Existe |
-| `categorias` | Peluquería, Faciales, Manicura... Cada servicio tendrá su categoría | Por hacer |
-| `fotos` | Fotos de la galería (dirección de la imagen, descripción, categoría) | Por hacer |
+| `categorias` | Peluquería, Faciales, Manicura... Cada servicio apunta a su categoría (clave foránea) | ✅ Hecha |
+| `fotos` | Fotos de la galería. Las imágenes se guardan dentro de la base de datos (reducidas a ~300 KB) | ✅ Hecha |
 
-| `articulos` | Artículos del blog: título, resumen, contenido, categoría (Cabello, Piel, Uñas, Novias), autora, fecha | Por hacer |
+| `destacados` | Qué foto de la galería se ve en cada sitio de la web (y qué servicio en los destacados de la portada) | ✅ Hecha |
+| `articulos` | Artículos del blog: título, resumen, contenido, tema (Cabello, Piel, Uñas, Novias), autora, fecha, publicado o borrador | ✅ Hecha |
 
 ## 6. Fases
 
@@ -138,7 +140,7 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
    - ✅ Nosotras (historia desde 2020, el nombre Laksmir, valores, equipo en detalle, el salón y las marcas)
    - ✅ Contacto (reservar, llamar, WhatsApp, Instagram, "abierto ahora", dirección, horario y mapa de Google que se carga al pulsar)
    - ✅ Blog (lista estilo revista con filtro por tema, página de artículo; de momento con artículos de ejemplo)
-3. **Funcionamiento**: categorías en la base de datos, galería con subida de fotos, blog en el panel de administración, asistente con IA.
+3. ✅ **Funcionamiento**: categorías en la base de datos, galería con subida de fotos, blog en el panel de administración, asistente (respuestas preparadas).
 4. **SEO**: títulos, descripciones, datos estructurados, mapa del sitio, alta en Google Search Console.
 5. **Publicación**: base de datos en TiDB, web en Netlify, dominio y quitar el mantenimiento.
 6. **Contenido real**: fotos del salón y primeros artículos del blog.

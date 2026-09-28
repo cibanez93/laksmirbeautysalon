@@ -1,4 +1,5 @@
-// Piezas de diseño reutilizables: adornos dorados, títulos de sección y huecos para fotos.
+// Piezas de diseño reutilizables: adornos dorados, títulos de sección y fotos.
+import Image from "next/image";
 
 // Adorno inspirado en el logo: línea, rombo, línea
 export function Adorno({ className = "" }: { className?: string }) {
@@ -41,6 +42,16 @@ export function FotoPendiente({ texto, className = "" }: { texto: string; classN
       <span className="absolute bottom-3 left-3 bg-white/80 px-2 py-1 text-[11px] uppercase tracking-wider text-neutral-600">
         Foto: {texto}
       </span>
+    </div>
+  );
+}
+
+// Foto elegida en el panel (Destacados). Si todavía no hay ninguna, se ve el hueco de ejemplo.
+export function FotoDestacada({ id, texto, className = "" }: { id?: number | null; texto: string; className?: string }) {
+  if (!id) return <FotoPendiente texto={texto} className={className} />;
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <Image src={`/fotos/${id}`} alt={texto} fill unoptimized className="object-cover" />
     </div>
   );
 }

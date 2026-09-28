@@ -14,7 +14,9 @@ Es un proyecto real: la web la usa el salón para enseñar sus servicios y manda
 
 **Panel de administración (`/admin`)**
 - Login con email y contraseña.
-- Crear, editar, ocultar/mostrar y borrar servicios.
+- Servicios: crear, editar, ocultar/mostrar y borrar, organizados por categorías.
+- Galería: subir fotos y antes/después (se reducen en el navegador antes de subirlas), ocultar y borrar.
+- Blog: escribir artículos, guardarlos como borrador o publicarlos.
 - Los cambios se ven en la web al momento.
 
 ## Tecnologías
@@ -66,9 +68,11 @@ Necesitas Node 22.18 o superior y MySQL.
    npm install
    ```
 
-2. Crea la base de datos y las tablas:
+2. Crea la base de datos y las tablas (el esquema inicial y después las migraciones, en orden):
    ```bash
    mysql -u root < database/schema.sql
+   mysql -u root < database/migraciones/2026-09-28-categorias-galeria-blog.sql
+   mysql -u root < database/migraciones/2026-09-29-destacados.sql
    ```
 
 3. Crea un usuario de MySQL para la web:
