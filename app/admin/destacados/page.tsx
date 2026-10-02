@@ -34,12 +34,12 @@ export default async function AdminDestacadosPage() {
         <p className="text-sm text-neutral-500 mb-2">Elige qué foto se ve en cada sitio de la web. Las fotos salen de la galería.</p>
         <p className="text-sm text-neutral-500 mb-10">
           ¿Quieres usar una foto que no salga en la galería (por ejemplo, la de una compañera)? Súbela en{" "}
-          <Link href="/admin/galeria" className="underline">Galería</Link> y márcala como oculta.
+          <Link href="/admin/galeria" className="underline">Galería</Link> quitando «Mostrarlas en la galería de la web».
         </p>
 
         {fotos.length === 0 && (
           <p className="bg-white border border-neutral-200 p-6 text-center text-neutral-500 mb-10">
-            Todavía no hay fotos en la galería. <Link href="/admin/galeria/nueva" className="underline">Sube la primera</Link> para poder elegirla aquí.
+            Todavía no hay fotos en la galería. <Link href="/admin/galeria" className="underline">Sube la primera</Link> para poder elegirla aquí.
           </p>
         )}
 

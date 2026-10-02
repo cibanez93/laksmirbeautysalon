@@ -69,7 +69,7 @@ async function AntesDespuesPortada() {
       return undefined;
     });
   if (!ultima) return <AntesDespues titulo="Mechas balayage" />;
-  return <AntesDespues titulo={ultima.titulo} antes={urlFotoAntes(ultima.id)} despues={urlFoto(ultima.id)} />;
+  return <AntesDespues titulo={ultima.titulo || "Antes y después"} antes={urlFotoAntes(ultima.id)} despues={urlFoto(ultima.id)} />;
 }
 
 // Recorta un texto largo a unas 140 letras sin cortar palabras

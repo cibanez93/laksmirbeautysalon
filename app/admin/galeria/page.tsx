@@ -2,14 +2,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { listarFotos, urlFoto } from "@/lib/fotos";
+import { listarCategorias } from "@/lib/servicios";
 import { requireSession } from "@/lib/session";
 import BotonBorrar from "../BotonBorrar";
 import MenuAdmin from "../MenuAdmin";
 import { alternarVisibleFoto, borrarFoto } from "./actions";
+import SubirVarias from "./SubirVarias";
 
 export default async function AdminGaleriaPage() {
   const sesion = await requireSession();
-  const lista = await listarFotos({ soloVisibles: false });
+  const [lista, categorias] = await Promise.all([listarFotos({ soloVisibles: false }), listarCategorias()]);
 
   return (
     <>
@@ -20,8 +22,10 @@ export default async function AdminGaleriaPage() {
             <h1 className="text-2xl font-light">Galería</h1>
             <p className="text-sm text-neutral-500">{lista.length} fotos · los antes/después salen destacados arriba en la web</p>
           </div>
-          <Link href="/admin/galeria/nueva" className="btn-primary">+ Subir foto</Link>
+          <Link href="/admin/galeria/nueva" className="btn-secondary">+ Subir un antes y después</Link>
         </div>
+
+        <SubirVarias categorias={categorias} />
 
         {lista.length === 0 ? (
           <p className="bg-white border border-neutral-200 p-8 text-center text-neutral-500">
@@ -32,7 +36,7 @@ export default async function AdminGaleriaPage() {
             {lista.map((f) => (
               <li key={f.id} className="bg-white border border-neutral-200">
                 <div className="relative aspect-square bg-neutral-100">
-                  <Image src={urlFoto(f.id)} alt={f.titulo} fill unoptimized sizes="25vw" className={`object-cover ${f.visible ? "" : "opacity-40"}`} />
+                  <Image src={urlFoto(f.id)} alt={f.titulo || "Foto sin título"} fill unoptimized sizes="25vw" className={`object-cover ${f.visible ? "" : "opacity-40"}`} />
                   {f.tipo === "antes_despues" && (
                     <span className="absolute top-2 left-2 bg-white/90 text-[10px] uppercase tracking-wider px-2 py-0.5">Antes / después</span>
                   )}
@@ -41,14 +45,14 @@ export default async function AdminGaleriaPage() {
                   )}
                 </div>
                 <div className="p-3">
-                  <p className="text-sm font-medium truncate">{f.titulo}</p>
+                  <p className={`text-sm truncate ${f.titulo ? "font-medium" : "text-neutral-400"}`}>{f.titulo || "Sin título"}</p>
                   <p className="text-xs text-neutral-500 mb-3">{f.categoria ?? "Sin categoría"}</p>
                   <div className="flex items-center justify-between text-sm">
                     <form action={alternarVisibleFoto.bind(null, f.id, !f.visible)}>
                       <button type="submit" className="text-neutral-600 hover:underline">{f.visible ? "Ocultar" : "Mostrar"}</button>
                     </form>
                     <Link href={`/admin/galeria/${f.id}`} className="text-neutral-900 hover:underline">Editar</Link>
-                    <BotonBorrar id={f.id} nombre={f.titulo} accion={borrarFoto} />
+                    <BotonBorrar id={f.id} nombre={f.titulo || "esta foto"} accion={borrarFoto} />
                   </div>
                 </div>
               </li>

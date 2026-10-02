@@ -2,7 +2,7 @@
 // para que pesen poco (~300 KB) y quepan en el límite de subida.
 const LADO_MAXIMO = 1600;
 
-async function reducir(archivo: File): Promise<File> {
+export async function reducir(archivo: File): Promise<File> {
   const bitmap = await createImageBitmap(archivo);
   const escala = Math.min(1, LADO_MAXIMO / Math.max(bitmap.width, bitmap.height));
   const lienzo = document.createElement("canvas");

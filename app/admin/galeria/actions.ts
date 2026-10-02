@@ -7,10 +7,9 @@ import { requireSession } from "@/lib/session";
 import type { EstadoFormulario } from "../actions";
 import { comprobarId, leerImagen, leerImagenOpcional, valoresDe } from "../utilidades";
 
-// Lee y valida los campos comunes (título, categoría y forma)
+// Lee y valida los campos comunes (título, categoría y forma). El título es opcional.
 function leerDatos(formData: FormData) {
   const titulo = String(formData.get("titulo") ?? "").trim();
-  if (!titulo) return "Escribe un título (por ejemplo, «Balayage rubio»).";
   if (titulo.length > 120) return "El título no puede tener más de 120 caracteres.";
 
   const formaTxt = String(formData.get("forma") ?? "cuadrada");
@@ -44,6 +43,20 @@ export async function subirFoto(_prev: EstadoFormulario, formData: FormData): Pr
   await fotos.crearFoto({ ...datos, tipo, imagen, imagen_antes });
   revalidatePath("/", "layout");
   redirect("/admin/galeria");
+}
+
+// Subida rápida (como en WordPress): se llama una vez por cada foto elegida, sin título.
+// La categoría es opcional y la misma para todas las fotos de esa tanda.
+export async function subirFotoRapida(formData: FormData): Promise<{ error?: string }> {
+  await requireSession();
+  const datos = leerDatos(formData);
+  if (typeof datos === "string") return { error: datos };
+  const imagen = await leerImagen(formData.get("imagen"));
+  if (typeof imagen === "string") return { error: imagen };
+
+  await fotos.crearFoto({ ...datos, tipo: "foto", imagen, imagen_antes: null, visible: formData.get("visible") === "si" });
+  revalidatePath("/", "layout");
+  return {};
 }
 
 export async function editarFoto(id: number, _prev: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {

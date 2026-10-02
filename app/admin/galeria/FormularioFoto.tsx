@@ -57,8 +57,8 @@ export default function FormularioFoto({ accion, categorias, inicial }: Props) {
       )}
 
       <label className="campo">
-        Título *
-        <input name="titulo" required maxLength={120} placeholder="Por ejemplo: Balayage rubio" defaultValue={v?.titulo ?? inicial?.titulo} className="input" />
+        Título (opcional, ayuda a Google a entender la foto)
+        <input name="titulo" maxLength={120} placeholder="Por ejemplo: Balayage rubio" defaultValue={v?.titulo ?? inicial?.titulo} className="input" />
       </label>
 
       <div className="grid sm:grid-cols-2 gap-6">

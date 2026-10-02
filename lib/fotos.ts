@@ -60,10 +60,11 @@ export async function crearFoto(d: {
   forma: FormaFoto;
   imagen: Buffer;
   imagen_antes: Buffer | null;
+  visible?: boolean;
 }): Promise<number> {
   const [res] = await db.execute<ResultSetHeader>(
-    "INSERT INTO fotos (titulo, categoria_id, tipo, forma, imagen, imagen_antes) VALUES (?, ?, ?, ?, ?, ?)",
-    [d.titulo, d.categoria_id, d.tipo, d.forma, d.imagen, d.imagen_antes]
+    "INSERT INTO fotos (titulo, categoria_id, tipo, forma, imagen, imagen_antes, visible) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [d.titulo, d.categoria_id, d.tipo, d.forma, d.imagen, d.imagen_antes, d.visible ?? true]
   );
   return res.insertId;
 }

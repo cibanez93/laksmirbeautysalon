@@ -34,7 +34,7 @@ export default async function GaleriaPage() {
   const todas = await getFotos();
   const hayFotos = todas.length > 0;
   const comparaciones = hayFotos
-    ? todas.filter((f) => f.tipo === "antes_despues").map((f) => ({ clave: String(f.id), titulo: f.titulo, servicio: f.categoria ?? "", antes: urlFotoAntes(f.id), despues: urlFoto(f.id) }))
+    ? todas.filter((f) => f.tipo === "antes_despues").map((f) => ({ clave: String(f.id), titulo: f.titulo || "Antes y después", servicio: f.categoria ?? "", antes: urlFotoAntes(f.id), despues: urlFoto(f.id) }))
     : ejemplosAntesDespues.map((a) => ({ clave: a.titulo, ...a }));
   const fotosNormales = todas.filter((f) => f.tipo === "foto");
 
@@ -72,7 +72,7 @@ export default async function GaleriaPage() {
               {hayFotos
                 ? fotosNormales.map((f) => (
                     <div key={f.id} className={`relative overflow-hidden ${formas[f.forma]}`}>
-                      <Image src={urlFoto(f.id)} alt={f.titulo} fill unoptimized className="object-cover" />
+                      <Image src={urlFoto(f.id)} alt={f.titulo || `Trabajo de Laksmir Beauty Salon${f.categoria ? ` · ${f.categoria}` : ""}`} fill unoptimized className="object-cover" />
                     </div>
                   ))
                 : ejemplosFotos.map((f) => <FotoPendiente key={f.texto} texto={f.texto} className={formas[f.forma]} />)}
