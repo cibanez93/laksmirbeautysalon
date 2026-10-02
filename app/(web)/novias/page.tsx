@@ -2,8 +2,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Adorno, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
-import { obtenerDestacadosSeguro } from "@/lib/destacados";
+import { Adorno, FotoDestacada, TituloSeccion } from "@/components/web/decoracion";
+import { fotosNovias, obtenerDestacadosSeguro } from "@/lib/destacados";
 import { calendario, packs, preguntasNovias } from "@/lib/novias";
 import EligePack from "./EligePack";
 
@@ -77,7 +77,7 @@ export default async function NoviasPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className="relative">
             <div aria-hidden="true" className="absolute inset-0 -translate-x-4 -translate-y-4 border border-dorado" />
-            <FotoPendiente texto="madrina e invitadas" className="relative aspect-[4/3]" />
+            <FotoDestacada id={d["novias-invitadas"]?.foto_id} texto="madrina e invitadas" className="relative aspect-[4/3]" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">También para ellas</p>
@@ -102,8 +102,8 @@ export default async function NoviasPage() {
         <div className="max-w-6xl mx-auto">
           <TituloSeccion antetitulo="Nuestras novias" titulo="Galería de novias" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {["recogido", "maquillaje", "detalle del peinado", "novia completa", "manicura", "semirrecogido", "maquillaje natural", "novia con velo"].map((t, i) => (
-              <FotoPendiente key={t} texto={t} className={i === 0 || i === 5 ? "row-span-2 aspect-[3/4] md:aspect-auto" : "aspect-square"} />
+            {fotosNovias.map((f, i) => (
+              <FotoDestacada key={f.id} id={d[f.id]?.foto_id} texto={f.texto.toLowerCase()} className={i === 0 || i === 5 ? "row-span-2 aspect-[3/4] md:aspect-auto" : "aspect-square"} />
             ))}
           </div>
           <div className="text-center mt-10">

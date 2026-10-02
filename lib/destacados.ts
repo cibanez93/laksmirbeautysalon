@@ -13,15 +13,32 @@ export interface Ubicacion {
   conServicio?: boolean; // en los servicios destacados también se elige el servicio
 }
 
+// Huecos de las galerías pequeñas de Nosotras («Nuestro salón») y Novias («Galería de novias»)
+export const fotosSalon = [
+  { id: "salon-fachada", texto: "Fachada" },
+  { id: "salon-peluqueria", texto: "Zona de peluquería" },
+  { id: "salon-estetica", texto: "Cabina de estética" },
+  { id: "salon-manicura", texto: "Zona de manicura" },
+  { id: "salon-detalle", texto: "Detalle" },
+];
+
+export const fotosNovias = ["Recogido", "Maquillaje", "Detalle del peinado", "Novia completa", "Manicura", "Semirrecogido", "Maquillaje natural", "Novia con velo"].map(
+  (texto, i) => ({ id: `novias-galeria-${i + 1}`, texto })
+);
+
 // Todos los sitios de la web con foto. El id es lo que se guarda en la base de datos.
 export const ubicaciones: Ubicacion[] = [
-  { id: "portada", nombre: "Foto principal (portada y «Nuestra historia»)", grupo: "Portada" },
+  { id: "portada", nombre: "Foto principal de la portada", grupo: "Portada" },
   { id: "destacado-1", nombre: "Servicio destacado 1", grupo: "Servicios destacados de la portada", conServicio: true },
   { id: "destacado-2", nombre: "Servicio destacado 2", grupo: "Servicios destacados de la portada", conServicio: true },
   { id: "destacado-3", nombre: "Servicio destacado 3", grupo: "Servicios destacados de la portada", conServicio: true },
   ...equipo.map((p) => ({ id: `equipo-${p.nombre.toLowerCase()}`, nombre: p.nombre, grupo: "Equipo" })),
   ...categorias.map((c) => ({ id: `categoria-${c.slug}`, nombre: c.nombre, grupo: "Categorías" })),
+  { id: "nosotras", nombre: "«Nuestra historia» (si no eliges, sale la de la portada)", grupo: "Nosotras" },
+  ...fotosSalon.map((f) => ({ id: f.id, nombre: `Nuestro salón: ${f.texto.toLowerCase()}`, grupo: "Nosotras" })),
   { id: "novias", nombre: "Novias (portada y página de novias)", grupo: "Novias" },
+  { id: "novias-invitadas", nombre: "Invitadas y madrinas", grupo: "Novias" },
+  ...fotosNovias.map((f, i) => ({ id: f.id, nombre: `Galería de novias ${i + 1}: ${f.texto.toLowerCase()}`, grupo: "Novias" })),
 ];
 
 export const esUbicacion = (id: string) => ubicaciones.some((u) => u.id === id);

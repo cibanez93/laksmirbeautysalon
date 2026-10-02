@@ -3,8 +3,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Adorno, Esquinas, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
-import { obtenerDestacadosSeguro } from "@/lib/destacados";
+import { Adorno, Esquinas, FotoDestacada, TituloSeccion } from "@/components/web/decoracion";
+import { fotosSalon, obtenerDestacadosSeguro } from "@/lib/destacados";
 import { obtenerOpiniones } from "@/lib/opiniones";
 import Loto from "@/components/web/Loto";
 import { categorias } from "@/lib/categorias";
@@ -38,7 +38,7 @@ export default async function NosotrasPage() {
       <section className="relative max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center px-4 md:px-8 py-16 md:py-24">
         <div className="relative order-2 md:order-1">
           <div aria-hidden="true" className="absolute inset-0 -translate-x-4 -translate-y-4 rounded-t-full border border-dorado" />
-          <FotoDestacada id={d.portada?.foto_id} texto="El equipo en el salón" className="relative aspect-[4/5] rounded-t-full" />
+          <FotoDestacada id={d.nosotras?.foto_id ?? d.portada?.foto_id} texto="El equipo en el salón" className="relative aspect-[4/5] rounded-t-full" />
           <div className="absolute -bottom-6 -right-2 md:-right-6 bg-white shadow-sm px-6 py-5 border border-linea text-center">
             <p className="font-serif text-4xl text-dorado-oscuro">{APERTURA}</p>
             <p className="text-[11px] uppercase tracking-widest text-neutral-500">Desde entonces en Ripagaina</p>
@@ -161,11 +161,9 @@ export default async function NosotrasPage() {
         <div className="max-w-6xl mx-auto">
           <TituloSeccion antetitulo="Te esperamos" titulo="Nuestro salón" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-20">
-            <FotoPendiente texto="fachada" className="col-span-2 row-span-2 aspect-square" />
-            <FotoPendiente texto="zona de peluquería" className="aspect-square" />
-            <FotoPendiente texto="cabina de estética" className="aspect-square" />
-            <FotoPendiente texto="zona de manicura" className="aspect-square" />
-            <FotoPendiente texto="detalle" className="aspect-square" />
+            {fotosSalon.map((f, i) => (
+              <FotoDestacada key={f.id} id={d[f.id]?.foto_id} texto={f.texto.toLowerCase()} className={i === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"} />
+            ))}
           </div>
 
           <div className="text-center">
