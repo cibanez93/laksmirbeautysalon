@@ -2,19 +2,28 @@
 // Uso:  npm run crear-admin
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
+import { Writable } from "node:stream";
 import mysql from "mysql2/promise";
 import { hashPassword } from "../lib/password.ts";
 
-const rl = createInterface({ input: stdin, output: stdout });
+// Lo que readline escribe en pantalla pasa por aquí. Mientras se escribe la contraseña
+// lo silenciamos, para que no se vea lo que se teclea.
+let silencio = false;
+const pantalla = new Writable({
+  write(trozo, codificacion, listo) {
+    if (!silencio) stdout.write(trozo, codificacion);
+    listo();
+  },
+});
+const rl = createInterface({ input: stdin, output: pantalla, terminal: true });
 
 // Pregunta ocultando lo que se escribe (para la contraseña)
 async function preguntarOculto(texto: string): Promise<string> {
-  const salida = rl as unknown as { _writeToOutput: (s: string) => void };
-  const original = salida._writeToOutput;
-  const promesa = rl.question(texto);
-  salida._writeToOutput = (s) => { if (s.includes("\n")) original.call(rl, s); };
-  const respuesta = await promesa;
-  salida._writeToOutput = original;
+  stdout.write(texto);
+  silencio = true;
+  const respuesta = await rl.question("");
+  silencio = false;
+  stdout.write("\n");
   return respuesta;
 }
 
