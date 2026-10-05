@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import type { RowDataPacket } from "mysql2";
 import { db } from "./db";
 
-const COOKIE = "laksmir_session";
+export const COOKIE = "laksmir_session";
 const DURACION_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 
 const sha256 = (valor: string) => createHash("sha256").update(valor).digest("hex");
@@ -34,8 +34,11 @@ export async function createSession(usuarioId: number) {
 // Devuelve el usuario conectado o null
 export async function getSession(): Promise<{ usuarioId: number; email: string } | null> {
   const token = (await cookies()).get(COOKIE)?.value;
-  if (!token) return null;
+  return token ? usuarioDeToken(token) : null;
+}
 
+// Busca la sesión de un token en la base de datos (también lo usa proxy.ts)
+export async function usuarioDeToken(token: string): Promise<{ usuarioId: number; email: string } | null> {
   const [rows] = await db.execute<RowDataPacket[]>(
     `SELECT u.id, u.email
        FROM sesiones s
