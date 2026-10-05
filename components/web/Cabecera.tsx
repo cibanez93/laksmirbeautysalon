@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import IconoCarrito from "@/components/tienda/IconoCarrito";
+import MenuMovil from "./MenuMovil";
 import { menu, salon } from "@/lib/salon";
 
 export default function Cabecera() {
@@ -22,18 +23,7 @@ export default function Cabecera() {
           <a href={salon.booksy} target="_blank" rel="noopener noreferrer" className="bg-neutral-900 text-white text-xs uppercase tracking-widest px-5 py-3 hover:bg-dorado-oscuro transition-colors">
             Reservar
           </a>
-          {/* Menú del móvil: <details> se abre y cierra sin JavaScript */}
-          <details className="lg:hidden group">
-            <summary className="list-none cursor-pointer border border-neutral-900 px-3 py-2.5 text-xs uppercase tracking-widest">
-              <span className="group-open:hidden">Menú</span>
-              <span className="hidden group-open:inline">Cerrar</span>
-            </summary>
-            <nav aria-label="Menú del móvil" className="absolute left-0 right-0 top-full bg-crema border-b border-linea px-4 py-2">
-              {menu.map((m) => (
-                <Link key={m.href} href={m.href} className="block py-3 border-b border-linea last:border-0 font-serif text-xl">{m.texto}</Link>
-              ))}
-            </nav>
-          </details>
+          <MenuMovil />
         </div>
       </div>
     </header>
