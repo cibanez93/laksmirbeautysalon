@@ -1,80 +1,121 @@
 // Conexión a MySQL (TiDB en la nube). Solo se puede usar en el servidor.
 //
 // Funciona en dos sitios distintos:
-// - En Node.js (tu ordenador con `npm run dev`): un "pool" mantiene varias conexiones abiertas
-//   y las reparte entre visitas.
-// - En Cloudflare Workers (la web publicada): Cloudflare NO deja reutilizar una conexión entre
-//   visitas, así que se abre una nueva cada vez. Va rápido porque se conecta a Hyperdrive,
-//   un servicio de Cloudflare que mantiene abiertas las conexiones con TiDB.
+// - En Node.js (tu ordenador con `npm run dev`): mysql2, con un "pool" que mantiene varias
+//   conexiones abiertas y las reparte entre visitas.
+// - En Cloudflare Workers (la web publicada): el driver oficial de TiDB (@tidbcloud/serverless),
+//   que habla con TiDB por HTTPS. mysql2 no sirve ahí: Cloudflare no tiene las funciones de Node
+//   que usa para cifrar la conexión, y Hyperdrive todavía no es compatible con TiDB Serverless.
+//
+// El resto de la web siempre usa lo mismo: db.query, db.execute y db.getConnection,
+// con las respuestas en el formato de mysql2. Aquí se traduce lo que haga falta.
 import "server-only";
+import { connect, type Connection as ConexionTiDB, type FullResult, type Tx } from "@tidbcloud/serverless";
 import mysql from "mysql2/promise";
 
 const enCloudflare = typeof navigator !== "undefined" && navigator.userAgent === "Cloudflare-Workers";
 
-// mysql2 genera código al vuelo para ir más rápido, pero Cloudflare no lo permite: disableEval lo evita
-const opcionesComunes = { disableEval: enCloudflare };
-
-// Datos de conexión de las variables de entorno (.env.local en tu ordenador)
-const desdeVariables = (): mysql.ConnectionOptions => ({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT ?? 3306),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  // Los servicios en la nube (TiDB, Aiven...) exigen conexión cifrada
-  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined,
-});
-
-// En Cloudflare: los datos de Hyperdrive (si está configurado) o, si no, las variables
-async function opcionesCloudflare(): Promise<mysql.ConnectionOptions> {
-  const { getCloudflareContext } = await import("@opennextjs/cloudflare");
-  const { env } = await getCloudflareContext({ async: true });
-  const hyperdrive = (env as { HYPERDRIVE?: { host: string; port: number; user: string; password: string; database: string } }).HYPERDRIVE;
-  if (!hyperdrive) return desdeVariables();
-  // Hyperdrive ya se conecta a TiDB cifrado; entre el Worker y Hyperdrive no hace falta SSL
-  return { host: hyperdrive.host, port: hyperdrive.port, user: hyperdrive.user, password: hyperdrive.password, database: hyperdrive.database };
-}
-
-// --- Node.js: pool compartido. En desarrollo Next recarga los módulos a menudo, así que
-// lo guardamos en globalThis para no abrir conexiones nuevas en cada recarga.
+// ---------------------------------------------------------------------------
+// Node.js: mysql2 con un pool compartido. En desarrollo Next recarga los módulos a menudo,
+// así que lo guardamos en globalThis para no abrir conexiones nuevas en cada recarga.
+// ---------------------------------------------------------------------------
 const globalForDb = globalThis as unknown as { pool?: mysql.Pool };
 
 function pool(): mysql.Pool {
-  globalForDb.pool ??= mysql.createPool({ ...desdeVariables(), ...opcionesComunes, connectionLimit: 5 });
+  globalForDb.pool ??= mysql.createPool({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT ?? 3306),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    connectionLimit: 5,
+    // Los servicios en la nube (TiDB, Aiven...) exigen conexión cifrada
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined,
+  });
   return globalForDb.pool;
 }
 
-// --- Cloudflare: una conexión nueva para cada uso, que se cierra al terminar
-async function conexionNueva() {
-  return mysql.createConnection({ ...(await opcionesCloudflare()), ...opcionesComunes });
+// ---------------------------------------------------------------------------
+// Cloudflare: driver de TiDB por HTTPS. No guarda conexiones abiertas: cada consulta es una petición.
+// ---------------------------------------------------------------------------
+function tidb(): ConexionTiDB<{ fullResult: true }> {
+  return connect({
+    host: process.env.DB_HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    fullResult: true,
+  });
 }
 
-async function conConexion<T>(trabajo: (c: mysql.Connection) => Promise<T>): Promise<T> {
-  const c = await conexionNueva();
-  try {
-    return await trabajo(c);
-  } finally {
-    c.end().catch(() => {});
+// El driver de TiDB devuelve las fechas como texto y las fotos como Uint8Array.
+// Las pasamos a Date y Buffer, como hace mysql2, para que el resto del código no note la diferencia.
+const FECHAS = new Set(["DATETIME", "TIMESTAMP"]);
+const BINARIOS = new Set(["BLOB", "TINYBLOB", "MEDIUMBLOB", "LONGBLOB", "BINARY", "VARBINARY"]);
+
+function aFormatoMysql2(r: FullResult) {
+  // SELECT: devuelve filas
+  if (r.rows && r.types) {
+    const tipos = Object.entries(r.types);
+    const filas = r.rows.map((fila) => {
+      const f = fila as Record<string, unknown>;
+      for (const [columna, tipo] of tipos) {
+        const valor = f[columna];
+        if (valor == null) continue;
+        if (FECHAS.has(tipo)) f[columna] = new Date(`${String(valor).replace(" ", "T")}Z`);
+        else if (BINARIOS.has(tipo)) f[columna] = Buffer.from(valor as Uint8Array);
+      }
+      return f;
+    });
+    return [filas, []];
   }
+  // INSERT, UPDATE, DELETE: cuántas filas cambiaron y el id nuevo
+  return [{ affectedRows: r.rowsAffected ?? 0, insertId: Number(r.lastInsertId ?? 0) }, undefined];
 }
 
-// Lo que usa el resto de la web: db.query, db.execute y db.getConnection (para transacciones).
-// Funcionan igual en los dos sitios.
-export const db = {
-  query: ((...args: unknown[]) =>
-    enCloudflare
-      ? conConexion((c) => (c.query as (...a: unknown[]) => Promise<unknown>)(...args))
-      : (pool().query as (...a: unknown[]) => Promise<unknown>)(...args)) as mysql.Pool["query"],
+type Ejecutor = { execute: (sql: string, args?: unknown[] | null) => Promise<unknown> };
 
-  execute: ((...args: unknown[]) =>
-    enCloudflare
-      ? conConexion((c) => (c.execute as (...a: unknown[]) => Promise<unknown>)(...args))
-      : (pool().execute as (...a: unknown[]) => Promise<unknown>)(...args)) as mysql.Pool["execute"],
+const ejecutarEn = async (ejecutor: Ejecutor, sql: string, valores?: unknown) =>
+  aFormatoMysql2((await ejecutor.execute(sql, (valores as unknown[]) ?? null)) as FullResult);
+
+// Una "conexión" para transacciones: todas las órdenes entre begin y commit van juntas
+function conexionTransaccion() {
+  const conexion = tidb();
+  let tx: Tx<{ fullResult: true }> | null = null;
+  const ejecutar = (sql: string, valores?: unknown) => ejecutarEn((tx ?? conexion) as Ejecutor, sql, valores);
+  return {
+    query: ejecutar,
+    execute: ejecutar,
+    beginTransaction: async () => {
+      tx = await conexion.begin();
+    },
+    commit: async () => {
+      await tx?.commit();
+      tx = null;
+    },
+    rollback: async () => {
+      await tx?.rollback();
+      tx = null;
+    },
+    release: () => {},
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Lo que usa el resto de la web
+// ---------------------------------------------------------------------------
+type Consulta = (...args: unknown[]) => Promise<unknown>;
+
+export const db = {
+  query: ((sql: string, valores?: unknown) =>
+    enCloudflare ? ejecutarEn(tidb() as Ejecutor, sql, valores) : (pool().query as Consulta)(sql, valores)) as mysql.Pool["query"],
+
+  execute: ((sql: string, valores?: unknown) =>
+    enCloudflare ? ejecutarEn(tidb() as Ejecutor, sql, valores) : (pool().execute as Consulta)(sql, valores)) as mysql.Pool["execute"],
 
   // Una conexión para varias órdenes seguidas (transacciones). Hay que llamar a release() al acabar.
   async getConnection(): Promise<mysql.PoolConnection> {
     if (!enCloudflare) return pool().getConnection();
-    const c = await conexionNueva();
-    return Object.assign(c, { release: () => void c.end().catch(() => {}) }) as unknown as mysql.PoolConnection;
+    return conexionTransaccion() as unknown as mysql.PoolConnection;
   },
 };

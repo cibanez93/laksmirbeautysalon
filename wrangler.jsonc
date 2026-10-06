@@ -1,5 +1,6 @@
 // Configuración de Cloudflare Workers (donde se publica la web).
-// Las claves secretas NO van aquí: se ponen con `npx wrangler secret put NOMBRE`.
+// Las claves secretas NO van aquí: se ponen con `npx wrangler secret put NOMBRE`
+// (DB_PASSWORD, STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "laksmir",
@@ -8,16 +9,11 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
-  // Hyperdrive: mantiene abiertas las conexiones con TiDB para que cada visita vaya rápida.
-  // PENDIENTE: pon aquí el id que da `npx wrangler hyperdrive create` (ver README).
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "PENDIENTE_ID_DE_HYPERDRIVE"
-      // Para probar en el ordenador (`npm run preview`) se usa la base de datos local: la dirección
-      // se pone en .dev.vars como CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE (no se sube a GitHub)
-    }
-  ],
-  // Variables que no son secretas
-  "vars": { "MANTENIMIENTO": "true" }
+  // Variables que no son secretas. La base de datos es TiDB Cloud (ver lib/db.ts).
+  "vars": {
+    "MANTENIMIENTO": "true",
+    "DB_HOST": "gateway01.eu-central-1.prod.aws.tidbcloud.com",
+    "DB_USER": "2NnTwvWYS6beizJ.laksmir_app",
+    "DB_NAME": "laksmir"
+  }
 }
