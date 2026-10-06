@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { paginasLegales } from "@/lib/legal";
 import { menu, salon } from "@/lib/salon";
 import { Adorno } from "./decoracion";
 
@@ -38,10 +39,18 @@ export default function Pie() {
         </div>
       </div>
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-[#E0D3C2] flex flex-col sm:flex-row justify-between gap-2 text-xs text-neutral-500">
-        <p>© {new Date().getFullYear()} {salon.nombre}</p>
+        <p>
+          © {new Date().getFullYear()} {salon.nombre}
+          {paginasLegales.map((p) => (
+            <span key={p.href}>
+              {" · "}
+              <Link href={p.href} className="hover:text-dorado-oscuro">{p.texto}</Link>
+            </span>
+          ))}
+        </p>
         <p>
           Diseño y desarrollo web:{" "}
-          <a href="https://github.com/cibanez93" target="_blank" rel="noopener noreferrer" className="text-neutral-700 hover:text-dorado-oscuro underline underline-offset-2">
+          <a href="https://claudiaibanez.com/diseno-web-peluquerias" target="_blank" rel="noopener" title="Diseño web para peluquerías y centros de estética" className="text-neutral-700 hover:text-dorado-oscuro underline underline-offset-2">
             Claudia Ibáñez
           </a>
         </p>
