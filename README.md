@@ -87,7 +87,9 @@ Necesitas Node 22.18 o superior y MySQL.
    GRANT SELECT, INSERT, UPDATE, DELETE ON laksmir.* TO 'laksmir_app'@'localhost';
    ```
 
-4. Crea un archivo `.env.local` con los datos de conexión:
+4. Crea un archivo `.env.desarrollo` con los datos de conexión. Lo carga `npm run dev`.
+   No se llama `.env.local` a propósito: el adaptador de Cloudflare mete los archivos `.env*` que Next.js
+   reconoce dentro de la web publicada, y las claves de tu ordenador no deben subir.
    ```
    DB_HOST=127.0.0.1
    DB_PORT=3306

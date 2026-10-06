@@ -177,7 +177,7 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
    - ✅ Decisión: los bonos de servicios se compran desde las listas de servicios (botón «Regalar» junto a «Reservar»). La tienda solo tiene tarjetas regalo y productos, con un aviso que lleva a Servicios.
    - ✅ Pedidos, líneas de pedido y bonos vendidos con código único (migración 2026-10-07-pedidos.sql).
 3. ✅ Pago con Stripe Checkout (lib/stripe.ts, app/(web)/tienda/carrito/actions.ts). Los precios se leen siempre de la base de datos; el stock de productos y las plazas de cursos se reservan al pulsar «Pagar» y se devuelven si la página de pago caduca sin pagar (30 minutos).
-   - ⬜ Poner las claves de PRUEBA en Vercel y en .env.local, crear el webhook en Stripe y probar con la tarjeta 4242 4242 4242 4242.
+   - ⬜ Poner las claves de PRUEBA en Cloudflare y en .env.desarrollo, crear el webhook en Stripe y probar con la tarjeta 4242 4242 4242 4242.
 4. ✅ Webhook (app/api/stripe/webhook) y página de «Gracias» con los códigos de los bonos para imprimir o guardar en PDF.
    - ⬜ Email propio con el bono (Resend). De momento Stripe manda el recibo si se activa en sus ajustes.
 5. ✅ Panel: Pedidos (lista, marcar como entregado o enviado), canjear bonos por código, «−1 vendido en el salón» en productos y alumnas de cada curso.

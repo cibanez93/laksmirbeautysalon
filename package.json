@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "crear-admin": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/crear-admin.ts",
+    "crear-admin": "node --env-file=.env.desarrollo --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/crear-admin.ts",
     "crear-admin:nube": "node --env-file=.env.nube --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/crear-admin.ts",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

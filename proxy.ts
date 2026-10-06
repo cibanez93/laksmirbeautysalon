@@ -1,6 +1,6 @@
 // Modo mantenimiento: mientras esté activo, las visitas ven /mantenimiento.
 // Está ACTIVADO por defecto. Para desactivarlo, pon MANTENIMIENTO=false
-// en las variables de entorno (en local, en .env.local).
+// en las variables de entorno (en local, en .env.desarrollo; en Cloudflare, en wrangler.jsonc).
 // Vista previa: quien ha entrado en el panel ve la web entera, para revisar cómo queda.
 import { NextResponse, type NextRequest } from "next/server";
 import { COOKIE, usuarioDeToken } from "@/lib/session";
