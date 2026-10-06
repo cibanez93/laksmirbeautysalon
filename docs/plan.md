@@ -144,8 +144,14 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
 3. ✅ **Funcionamiento**: categorías en la base de datos, galería con subida de fotos, blog en el panel de administración, asistente (respuestas preparadas).
 4. **SEO**: títulos, descripciones, datos estructurados, mapa del sitio, alta en Google Search Console.
 5. **Publicación**, en dos partes:
-   - **Parte 1**: copiar la base de datos local a TiDB, crear el usuario de la web y poner sus datos en Vercel. Las clientas siguen viendo el mantenimiento, pero el panel ya funciona en la web real.
-   - **Parte 2**: quitar el mantenimiento cuando estén las fotos reales, los textos revisados y las páginas legales.
+   - ✅ **Parte 1**: base de datos en TiDB y web en **Cloudflare Workers** con el dominio `www.laksmirbeautysalon.com` (DNS en Cloudflare, dominio registrado en Porkbun, reenvío de email de Porkbun). Vercel borrado. Las clientas ven el mantenimiento; el equipo ve la web entera (vista previa).
+   - **Parte 2**: quitar el mantenimiento. Antes de hacerlo, comprobar esta lista:
+     - ⬜ Fotos reales en todos los huecos (Destacados) y textos revisados con Carla.
+     - ⬜ Páginas legales con los datos de Carla y revisadas por la gestoría (y condiciones de compra).
+     - ⬜ **Que no se pueda comprar nada que no sea real**: en la Tienda solo los productos que Carla haya creado en el panel; si no hay ninguno, quitar «Tienda» del menú. En Academia, igual con los cursos (si no hay ninguno, quitar «Academia» del menú). Los de ejemplo ya no se pueden pagar, pero no deben verse.
+     - ⬜ Compra de prueba en el dominio de verdad (tarjeta 4242) y canje del bono en el panel.
+     - ⬜ Pasar Stripe a modo real: claves `sk_live_` en Cloudflare y un webhook nuevo en modo real.
+     - ⬜ `"MANTENIMIENTO": "false"` en `wrangler.jsonc` y `npm run deploy`.
    - ✅ Páginas legales en borrador: aviso legal, privacidad y cookies (enlaces en el pie). Faltan los datos de Carla en `lib/legal.ts` y que las revise la gestoría. La web no necesita aviso de cookies porque solo usa las técnicas y el mapa se carga al pulsar.
 6. **Contenido real**: fotos del salón y primeros artículos del blog.
 
