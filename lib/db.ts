@@ -53,11 +53,15 @@ function tidb(): ConexionTiDB<{ fullResult: true }> {
 const FECHAS = new Set(["DATETIME", "TIMESTAMP"]);
 const BINARIOS = new Set(["BLOB", "TINYBLOB", "MEDIUMBLOB", "LONGBLOB", "BINARY", "VARBINARY"]);
 
-function aFormatoMysql2(r: FullResult) {
+// ¿La orden devuelve filas (SELECT) o cambia datos (INSERT, UPDATE, DELETE)?
+// Se mira el texto de la orden: el driver devuelve una lista vacía de filas también en los INSERT.
+const devuelveFilas = (sql: string) => /^\s*(select|show|with|describe|explain)\b/i.test(sql);
+
+function aFormatoMysql2(sql: string, r: FullResult) {
   // SELECT: devuelve filas
-  if (r.rows && r.types) {
-    const tipos = Object.entries(r.types);
-    const filas = r.rows.map((fila) => {
+  if (devuelveFilas(sql)) {
+    const tipos = Object.entries(r.types ?? {});
+    const filas = (r.rows ?? []).map((fila) => {
       const f = fila as Record<string, unknown>;
       for (const [columna, tipo] of tipos) {
         const valor = f[columna];
@@ -76,7 +80,7 @@ function aFormatoMysql2(r: FullResult) {
 type Ejecutor = { execute: (sql: string, args?: unknown[] | null) => Promise<unknown> };
 
 const ejecutarEn = async (ejecutor: Ejecutor, sql: string, valores?: unknown) =>
-  aFormatoMysql2((await ejecutor.execute(sql, (valores as unknown[]) ?? null)) as FullResult);
+  aFormatoMysql2(sql, (await ejecutor.execute(sql, (valores as unknown[]) ?? null)) as FullResult);
 
 // Una "conexión" para transacciones: todas las órdenes entre begin y commit van juntas
 function conexionTransaccion() {
