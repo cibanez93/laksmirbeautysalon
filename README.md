@@ -24,7 +24,9 @@ Es un proyecto real: la web la usa el salón para enseñar sus servicios y manda
 - Next.js 16 (App Router, Server Components y Server Actions)
 - React 19 y TypeScript
 - Tailwind CSS 4
-- MySQL con la librería `mysql2`
+- MySQL con la librería `mysql2` (en producción, TiDB Cloud)
+- Pagos con Stripe Checkout
+- Publicada en Cloudflare Workers con OpenNext y Hyperdrive
 
 ## Algunas decisiones
 
@@ -116,8 +118,35 @@ Necesitas Node 22.18 o superior y MySQL.
    ```
    La web queda en http://localhost:3000 y el panel en http://localhost:3000/admin
 
+## Publicar en Cloudflare
+
+La web se publica en **Cloudflare Workers** con el adaptador [OpenNext](https://opennext.js.org/cloudflare).
+La base de datos (TiDB) se conecta a través de **Hyperdrive**, que mantiene las conexiones abiertas
+(Cloudflare no deja reutilizar una conexión entre visitas; ver `lib/db.ts`).
+
+Probar en el ordenador como si fuera Cloudflare (usa la base de datos local):
+```bash
+CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE="mysql://usuario:contraseña@127.0.0.1:3306/laksmir" npm run preview
+```
+Las variables de esa prueba (por ejemplo `MANTENIMIENTO=false`) van en `.dev.vars`, que no se sube a GitHub.
+
+Publicar por primera vez:
+1. `npx wrangler login`
+2. Crear Hyperdrive con el usuario de la web y copiar su id en `wrangler.jsonc`:
+   ```bash
+   npx wrangler hyperdrive create laksmir-tidb --connection-string="mysql://USUARIO:CONTRASEÑA@HOST:4000/laksmir"
+   ```
+3. `npm run deploy`
+4. Claves secretas (se escriben en la Terminal, nunca en el código):
+   ```bash
+   npx wrangler secret put STRIPE_SECRET_KEY
+   npx wrangler secret put STRIPE_WEBHOOK_SECRET
+   ```
+5. El modo mantenimiento se quita poniendo `"MANTENIMIENTO": "false"` en `wrangler.jsonc` y volviendo a publicar.
+
+Las siguientes veces basta con `npm run deploy`.
+
 ## Pendiente
 
-- Publicar la web y pasar la base de datos a un MySQL en la nube.
 - Subir fotos de los servicios desde el panel.
 - Limitar los intentos de login para evitar ataques de fuerza bruta.

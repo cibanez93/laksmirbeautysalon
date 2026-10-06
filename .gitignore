@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cloudflare (OpenNext y Wrangler)
+.open-next
+.wrangler
+.dev.vars*
+cloudflare-env.d.ts
+.cf-local-hyperdrive
