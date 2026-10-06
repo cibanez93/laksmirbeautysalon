@@ -14,9 +14,20 @@ async function esDelEquipo(request: NextRequest) {
   return usuarioDeToken(token).then(Boolean).catch(() => false);
 }
 
+// La web vive en www. Quien entra sin www (laksmirbeautysalon.com) va a la misma página con www,
+// para que Google no vea dos webs iguales.
+const DOMINIO_SIN_WWW = "laksmirbeautysalon.com";
+
 export default async function proxy(request: NextRequest) {
   const enMantenimiento = process.env.MANTENIMIENTO !== "false";
   const { pathname } = request.nextUrl;
+
+  if (request.nextUrl.hostname === DOMINIO_SIN_WWW) {
+    const destino = request.nextUrl.clone();
+    destino.hostname = `www.${DOMINIO_SIN_WWW}`;
+    destino.port = "";
+    return NextResponse.redirect(destino, 308);
+  }
 
   if (enMantenimiento && pathname !== "/mantenimiento") {
     if (await esDelEquipo(request)) {
