@@ -8,7 +8,7 @@ import { requireSession } from "@/lib/session";
 import { euros } from "@/lib/tienda";
 import BotonBorrar from "../BotonBorrar";
 import MenuAdmin from "../MenuAdmin";
-import { alternarActivoProducto, borrarProducto } from "./actions";
+import { alternarActivoProducto, borrarProducto, venderEnSalon } from "./actions";
 import { alternarActivoTarjeta, borrarTarjeta } from "./tarjetas/actions";
 
 export default async function AdminTiendaPage() {
@@ -81,7 +81,12 @@ export default async function AdminTiendaPage() {
                   </p>
                   <p className="text-sm text-neutral-500">{[p.marca, euros(p.precio), `stock ${p.stock}`].filter(Boolean).join(" · ")}</p>
                 </div>
-                <div className="flex items-center gap-5 text-sm">
+                <div className="flex flex-wrap items-center gap-5 text-sm">
+                  {p.stock > 0 && (
+                    <form action={venderEnSalon.bind(null, p.id)}>
+                      <button type="submit" title="Resta 1 del stock" className="btn-secondary !px-3 !py-1.5 !text-xs">−1 vendido en el salón</button>
+                    </form>
+                  )}
                   <form action={alternarActivoProducto.bind(null, p.id, !p.activo)}>
                     <button type="submit" className="text-neutral-600 hover:underline">{p.activo ? "Ocultar" : "Mostrar"}</button>
                   </form>

@@ -1,10 +1,10 @@
 // Datos y ayudas de la tienda online (se usan en la web y en el carrito).
-// Los productos y los bonos se gestionan en el panel. El pago todavía no funciona.
+// Los productos, tarjetas, bonos y cursos se gestionan en el panel. El pago es con Stripe (lib/stripe.ts).
 
-export type TipoArticulo = "bono" | "tarjeta" | "producto";
+export type TipoArticulo = "bono" | "tarjeta" | "producto" | "curso";
 
 export interface ArticuloCarrito {
-  id: string; // "bono-12", "tarjeta-3", "producto-7"
+  id: string; // "bono-12", "tarjeta-3", "producto-7", "curso-2"
   tipo: TipoArticulo;
   nombre: string;
   detalle?: string; // p. ej. la categoría del servicio

@@ -7,11 +7,13 @@ const secciones = [
   { texto: "Servicios", href: "/admin" },
   { texto: "Galería", href: "/admin/galeria" },
   { texto: "Destacados", href: "/admin/destacados" },
+  { texto: "Pedidos", href: "/admin/pedidos" },
   { texto: "Tienda", href: "/admin/tienda" },
+  { texto: "Academia", href: "/admin/academia" },
   { texto: "Blog", href: "/admin/blog" },
 ];
 
-export default function MenuAdmin({ activa, email }: { activa: "Servicios" | "Galería" | "Destacados" | "Tienda" | "Blog"; email: string }) {
+export default function MenuAdmin({ activa, email }: { activa: "Servicios" | "Galería" | "Destacados" | "Pedidos" | "Tienda" | "Academia" | "Blog"; email: string }) {
   return (
     <header className="bg-white border-b border-neutral-200 mb-10">
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-4 flex flex-wrap items-center justify-between gap-4">

@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { ArticuloCarrito } from "@/lib/tienda";
 import { useCarrito } from "./CarritoContexto";
 
-export default function BotonAnadir({ articulo, className = "" }: { articulo: Omit<ArticuloCarrito, "cantidad">; className?: string }) {
+export default function BotonAnadir({ articulo, className = "", texto = "Añadir al carrito" }: { articulo: Omit<ArticuloCarrito, "cantidad">; className?: string; texto?: string }) {
   const { anadir } = useCarrito();
   const [anadido, setAnadido] = useState(false);
 
@@ -27,7 +27,7 @@ export default function BotonAnadir({ articulo, className = "" }: { articulo: Om
       }}
       className={`text-xs uppercase tracking-widest px-4 py-3 bg-dorado text-neutral-900 hover:bg-neutral-900 hover:text-white transition-colors ${className}`}
     >
-      Añadir al carrito
+      {texto}
     </button>
   );
 }

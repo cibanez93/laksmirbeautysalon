@@ -40,6 +40,6 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // No toca el panel, las fotos de la galería, los archivos de Next, las imágenes ni las fuentes
-  matcher: ["/((?!admin|fotos/|_next/|favicon.ico|.*\\.(?:png|jpg|jpeg|webp|svg|ico|otf|ttf|woff2?)$).*)"],
+  // No toca el panel, la API (el aviso de pagos de Stripe), las fotos, los archivos de Next, las imágenes ni las fuentes
+  matcher: ["/((?!admin|api/|fotos/|_next/|favicon.ico|.*\\.(?:png|jpg|jpeg|webp|svg|ico|otf|ttf|woff2?)$).*)"],
 };

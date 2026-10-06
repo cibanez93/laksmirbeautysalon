@@ -1,15 +1,31 @@
 "use client";
 // Contenido del carrito: artículos, mensaje para el regalo, entrega y total.
-// FASE DE DISEÑO: el botón de pagar todavía no funciona (se conectará con Stripe).
+// «Pagar» manda el carrito al servidor, que comprueba precios y stock y abre la página de pago de Stripe.
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useCarrito } from "@/components/tienda/CarritoContexto";
 import { envio, euros, MESES_CADUCIDAD, tieneProductos, totales } from "@/lib/tienda";
 import { salon } from "@/lib/salon";
+import { iniciarPago } from "./actions";
 
-export default function Carrito() {
+export default function Carrito({ pagoActivo }: { pagoActivo: boolean }) {
   const { articulos, cambiarCantidad, quitar } = useCarrito();
   const [entrega, setEntrega] = useState<"recogida" | "envio">("recogida");
+  const [error, setError] = useState<string | null>(null);
+  const [pagando, empezarPago] = useTransition();
+
+  const pagar = (formData: FormData) => {
+    setError(null);
+    empezarPago(async () => {
+      const respuesta = await iniciarPago({
+        articulos: articulos.map((a) => ({ id: a.id, cantidad: a.cantidad })),
+        quiereEnvio: entrega === "envio",
+        regalo: { para: String(formData.get("para") ?? ""), de: String(formData.get("de") ?? ""), mensaje: String(formData.get("mensaje") ?? "") },
+      });
+      if ("url" in respuesta) window.location.href = respuesta.url;
+      else setError(respuesta.error);
+    });
+  };
 
   if (articulos.length === 0) {
     return (
@@ -23,11 +39,11 @@ export default function Carrito() {
   }
 
   const hayProductos = tieneProductos(articulos);
-  const hayRegalos = articulos.some((a) => a.tipo !== "producto");
+  const hayRegalos = articulos.some((a) => a.tipo === "bono" || a.tipo === "tarjeta");
   const { subtotal, gastosEnvio, total } = totales(articulos, entrega);
 
   return (
-    <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+    <form action={pagar} className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
       <div className="space-y-8">
         {/* Artículos */}
         <ul className="bg-white border border-linea divide-y divide-linea">
@@ -36,7 +52,7 @@ export default function Carrito() {
               <div className="flex-1 min-w-0">
                 <p className="font-serif text-lg">{a.nombre}</p>
                 <p className="text-xs uppercase tracking-wider text-neutral-500">
-                  {a.tipo === "producto" ? a.detalle : `Regalo digital · válido ${MESES_CADUCIDAD === 12 ? "1 año" : `${MESES_CADUCIDAD} meses`}`}
+                  {a.tipo === "producto" || a.tipo === "curso" ? a.detalle : `Regalo digital · válido ${MESES_CADUCIDAD === 12 ? "1 año" : `${MESES_CADUCIDAD} meses`}`}
                 </p>
               </div>
               <div className="flex items-center gap-5">
@@ -56,7 +72,7 @@ export default function Carrito() {
         {hayRegalos && (
           <fieldset className="bg-white border border-linea p-6">
             <legend className="font-serif text-xl px-1">Personaliza tu regalo</legend>
-            <p className="text-sm text-neutral-500 mb-5">Aparecerá en el bono que recibirás por email para regalar.</p>
+            <p className="text-sm text-neutral-500 mb-5">Aparecerá en el bono que podrás imprimir o enviar para regalar.</p>
             <div className="grid sm:grid-cols-2 gap-5 mb-5">
               <label className="campo">
                 Para
@@ -112,14 +128,17 @@ export default function Carrito() {
           <div className="flex justify-between border-t border-[#E0D3C2] pt-3 text-base font-medium"><dt>Total</dt><dd>{euros(total)}</dd></div>
         </dl>
         <p className="text-xs text-neutral-500 mb-5">IVA incluido.</p>
-        <button type="button" disabled className="w-full bg-neutral-900 text-white text-sm uppercase tracking-widest px-6 py-4 disabled:opacity-40">
-          Pagar con tarjeta
+        <button type="submit" disabled={!pagoActivo || pagando} className="w-full bg-neutral-900 text-white text-sm uppercase tracking-widest px-6 py-4 hover:bg-dorado-oscuro transition-colors disabled:opacity-40">
+          {pagando ? "Abriendo el pago…" : "Pagar con tarjeta"}
         </button>
-        <p className="text-xs text-neutral-500 mt-3 text-center">El pago online se activará muy pronto.</p>
+        {error && <p role="alert" className="text-sm text-red-700 mt-3">{error}</p>}
+        <p className="text-xs text-neutral-500 mt-3 text-center">
+          {pagoActivo ? "Pago seguro con Stripe. Tus datos de la tarjeta nunca pasan por nuestra web." : "El pago online se activará muy pronto."}
+        </p>
         <Link href="/tienda" className="block text-center text-sm text-neutral-600 underline underline-offset-2 mt-5 hover:text-neutral-900">
           Seguir comprando
         </Link>
       </aside>
-    </div>
+    </form>
   );
 }

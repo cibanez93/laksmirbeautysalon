@@ -71,6 +71,10 @@ export async function cambiarFotoProducto(id: number, foto_id: number | null) {
   await db.execute("UPDATE productos SET foto_id = ? WHERE id = ?", [foto_id, id]);
 }
 
+export async function restarStock(id: number, cantidad: number) {
+  await db.execute("UPDATE productos SET stock = stock - ? WHERE id = ? AND stock >= ?", [cantidad, id, cantidad]);
+}
+
 export async function cambiarActivoProducto(id: number, activo: boolean) {
   await db.execute("UPDATE productos SET activo = ? WHERE id = ?", [activo, id]);
 }

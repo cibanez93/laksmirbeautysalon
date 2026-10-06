@@ -62,6 +62,13 @@ export async function editarProducto(id: number, _prev: EstadoFormulario, formDa
   redirect("/admin/tienda");
 }
 
+// Venta en el salón: resta 1 del stock para que la web no venda lo que ya no hay
+export async function venderEnSalon(id: number) {
+  await requireSession();
+  await productos.restarStock(comprobarId(id), 1);
+  revalidatePath("/", "layout");
+}
+
 export async function alternarActivoProducto(id: number, activo: boolean) {
   await requireSession();
   await productos.cambiarActivoProducto(comprobarId(id), activo === true);
