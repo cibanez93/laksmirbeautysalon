@@ -37,6 +37,7 @@ export const marcas = ["Wella Professionals", "SP System Professional", "Casmara
 export const menu = [
   { texto: "Servicios", href: "/servicios" },
   { texto: "Novias", href: "/novias" },
+  { texto: "Academia", href: "/academia" },
   { texto: "Galería", href: "/galeria" },
   { texto: "Tienda", href: "/tienda" },
   { texto: "Nosotras", href: "/nosotras" },

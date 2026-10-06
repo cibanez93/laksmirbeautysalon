@@ -88,7 +88,7 @@ export async function borrarFoto(id: number) {
 }
 
 // Foto de un servicio, un producto o una tarjeta regalo: no sale en la galería. Devuelve su id.
-export async function crearImagenInterna(titulo: string, origen: "servicio" | "producto" | "tarjeta", imagen: Buffer): Promise<number> {
+export async function crearImagenInterna(titulo: string, origen: "servicio" | "producto" | "tarjeta" | "curso", imagen: Buffer): Promise<number> {
   const [res] = await db.execute<ResultSetHeader>(
     "INSERT INTO fotos (titulo, tipo, origen, imagen, visible) VALUES (?, 'foto', ?, ?, FALSE)",
     [titulo.slice(0, 120), origen, imagen]
@@ -98,5 +98,5 @@ export async function crearImagenInterna(titulo: string, origen: "servicio" | "p
 
 // Borra una foto de servicio, producto o tarjeta que ya no se usa (nunca borra fotos de la galería)
 export async function borrarImagenInterna(id: number) {
-  await db.execute("DELETE FROM fotos WHERE id = ? AND origen IN ('servicio', 'producto', 'tarjeta')", [id]);
+  await db.execute("DELETE FROM fotos WHERE id = ? AND origen IN ('servicio', 'producto', 'tarjeta', 'curso')", [id]);
 }
