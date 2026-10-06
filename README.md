@@ -75,6 +75,8 @@ Necesitas Node 22.18 o superior y MySQL.
    mysql -u root < database/migraciones/2026-09-29-destacados.sql
    mysql -u root < database/migraciones/2026-09-30-tienda.sql
    mysql -u root < database/migraciones/2026-10-01-tarjetas-regalo.sql
+   mysql -u root < database/migraciones/2026-10-06-cursos.sql
+   mysql -u root < database/migraciones/2026-10-07-pedidos.sql
    ```
 
 3. Crea un usuario de MySQL para la web:
@@ -92,6 +94,16 @@ Necesitas Node 22.18 o superior y MySQL.
    DB_NAME=laksmir
    ```
    Si la base de datos está en la nube y pide conexión cifrada, añade `DB_SSL=true`.
+
+   Para cobrar en la tienda (Stripe), añade también las claves. Sin ellas la web funciona,
+   pero el botón «Pagar» sale desactivado:
+   ```
+   STRIPE_SECRET_KEY=sk_test_...       # Stripe → Desarrolladores → Claves de API
+   STRIPE_WEBHOOK_SECRET=whsec_...     # Stripe → Desarrolladores → Webhooks (o `stripe listen`)
+   ```
+   El webhook de Stripe tiene que apuntar a `https://<dominio>/api/stripe/webhook` y avisar de
+   `checkout.session.completed`, `checkout.session.expired`,
+   `checkout.session.async_payment_succeeded` y `checkout.session.async_payment_failed`.
 
 5. Crea tu usuario para el panel (te pide email y contraseña):
    ```bash

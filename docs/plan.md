@@ -143,7 +143,10 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
    - ✅ Blog (lista estilo revista con filtro por tema, página de artículo; de momento con artículos de ejemplo)
 3. ✅ **Funcionamiento**: categorías en la base de datos, galería con subida de fotos, blog en el panel de administración, asistente (respuestas preparadas).
 4. **SEO**: títulos, descripciones, datos estructurados, mapa del sitio, alta en Google Search Console.
-5. **Publicación**: base de datos en TiDB, web en Netlify, dominio y quitar el mantenimiento.
+5. **Publicación**, en dos partes:
+   - **Parte 1**: copiar la base de datos local a TiDB, crear el usuario de la web y poner sus datos en Vercel. Las clientas siguen viendo el mantenimiento, pero el panel ya funciona en la web real.
+   - **Parte 2**: quitar el mantenimiento cuando estén las fotos reales, los textos revisados y las páginas legales.
+   - ✅ Páginas legales en borrador: aviso legal, privacidad y cookies (enlaces en el pie). Faltan los datos de Carla en `lib/legal.ts` y que las revise la gestoría. La web no necesita aviso de cookies porque solo usa las técnicas y el mapa se carga al pulsar.
 6. **Contenido real**: fotos del salón y primeros artículos del blog.
 
 ## 8. Tienda online
@@ -172,11 +175,14 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
    - ✅ Productos gestionados desde el panel (sección Tienda): foto, marca, descripción, precio, stock y visible. Con stock 0 salen como agotados.
    - ✅ Cada servicio puede tener foto (sale en su lista y en su bono), precio para la tienda y la casilla «Se puede regalar».
    - ✅ Decisión: los bonos de servicios se compran desde las listas de servicios (botón «Regalar» junto a «Reservar»). La tienda solo tiene tarjetas regalo y productos, con un aviso que lleva a Servicios.
-   - ⬜ Pedidos y bonos vendidos (con código único).
-3. Pago con Stripe en modo de pruebas (tarjetas de prueba, sin dinero real).
-4. Después del pago: confirmación, email con el bono y aviso al salón.
-5. Panel: productos y stock, pedidos, y canjear bonos (marcar como usado).
-6. Páginas legales y pasar Stripe a modo real.
+   - ✅ Pedidos, líneas de pedido y bonos vendidos con código único (migración 2026-10-07-pedidos.sql).
+3. ✅ Pago con Stripe Checkout (lib/stripe.ts, app/(web)/tienda/carrito/actions.ts). Los precios se leen siempre de la base de datos; el stock de productos y las plazas de cursos se reservan al pulsar «Pagar» y se devuelven si la página de pago caduca sin pagar (30 minutos).
+   - ⬜ Poner las claves de PRUEBA en Vercel y en .env.local, crear el webhook en Stripe y probar con la tarjeta 4242 4242 4242 4242.
+4. ✅ Webhook (app/api/stripe/webhook) y página de «Gracias» con los códigos de los bonos para imprimir o guardar en PDF.
+   - ⬜ Email propio con el bono (Resend). De momento Stripe manda el recibo si se activa en sus ajustes.
+5. ✅ Panel: Pedidos (lista, marcar como entregado o enviado), canjear bonos por código, «−1 vendido en el salón» en productos y alumnas de cada curso.
+6. Páginas legales (con condiciones de compra) y pasar Stripe a modo real.
+7. Cursos online: zona de alumnas con vídeos privados (de momento salen como «Próximamente»).
 
 ## Pendiente de revisar con Carla
 
@@ -185,6 +191,8 @@ Decisión: **diseñar todas las páginas primero y publicar al final**. Mientras
 - Nombres de servicios con erratas o sin tildes (se corrigen en la base de datos).
 - Contenido de los packs de novia, el calendario y las preguntas de novias (`lib/novias.ts`).
 - Historia del salón y valores (`app/(web)/nosotras/page.tsx`).
+- Datos para las páginas legales (`lib/legal.ts`): si es autónoma o S.L., nombre o razón social, NIF y email de contacto. Y si su gestoría puede revisar los textos.
+- 7 descripciones de servicios que dicen precios (ids 6, 8, 14, 24, 31, 46 y 56): hay una propuesta de texto nuevo para cambiarlas.
 - Historias de Carla, Helen y Erika: son un borrador sin datos concretos; cada una tiene que leer la suya y añadir su formación o años de experiencia si quiere (`lib/equipo.ts`).
 
 ## 7. Ideas para más adelante
