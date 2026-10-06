@@ -61,7 +61,8 @@ DATOS DEL SALÓN
 - Teléfono y WhatsApp: ${salon.telefono}
 - Instagram: ${salon.instagram.usuario}
 - Horario: ${horario}
-- Reservas: online en Booksy, por teléfono o por WhatsApp. En Booksy también se compran tarjetas regalo.
+- Reservas: online en Booksy, por teléfono o por WhatsApp.
+- Regalos: tarjetas regalo y bonos de servicios se compran en la web, en la página de Servicios (/servicios#regalar). Los productos, en la Tienda (/tienda). Los cursos, en Academia (/academia).
 - Abierto desde 2020. Marcas: Wella Professionals, SP System Professional, Casmara, Kinetics y Tanino Therapy.
 - El diagnóstico facial es gratuito y dura unos 15 minutos: es el punto de partida recomendado para cualquier tratamiento facial.
 

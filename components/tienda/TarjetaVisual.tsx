@@ -1,5 +1,6 @@
 // Cómo se ve una tarjeta regalo: el diseño subido en el panel o, si no hay, el diseño de Laksmir
 // (fondo negro, marcos y esquinas dorados, loto de fondo y el importe grande en el centro).
+// Los textos miden en «cqw» (porcentaje del ancho de la tarjeta): así se ve bien grande o pequeña.
 import Image from "next/image";
 import { euros } from "@/lib/tienda";
 import { Adorno, Esquinas } from "../web/decoracion";
@@ -25,7 +26,7 @@ export default function TarjetaVisual({ importe, fotoId, nombre }: { importe: nu
     <div
       role="img"
       aria-label={`${nombre} de ${precio}`}
-      className="relative aspect-[3/2] overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-800 text-white flex flex-col items-center justify-center text-center px-4"
+      className="@container relative aspect-[3/2] overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-800 text-white flex flex-col items-center justify-center text-center px-[8%]"
     >
       {/* Doble marco dorado y esquinas */}
       <div aria-hidden="true" className="absolute inset-2 border border-dorado/50" />
@@ -34,9 +35,9 @@ export default function TarjetaVisual({ importe, fotoId, nombre }: { importe: nu
       {/* Flor de loto muy suave de fondo */}
       <Loto className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-auto text-dorado/10" grosor={0.6} />
 
-      <p className="relative text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-dorado/90">{nombrePropio ?? "Tarjeta regalo"}</p>
-      <Adorno className="relative my-1.5 scale-75" />
-      <p className="relative font-serif text-4xl text-dorado leading-none">{precio}</p>
+      <p className="relative text-[max(7px,5cqw)] uppercase tracking-[0.25em] leading-tight text-dorado/90">{nombrePropio ?? "Tarjeta regalo"}</p>
+      <Adorno className="relative my-[3cqw] scale-75" />
+      <p className="relative font-serif text-[18cqw] text-dorado leading-none">{precio}</p>
     </div>
   );
 }

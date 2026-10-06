@@ -237,8 +237,8 @@ const temas: Tema[] = [
     id: "regalo",
     palabras: ["regal", "tarjeta regalo", "cheque", "bono", "cumpleaños", "sorpresa"],
     respuesta: {
-      texto: "¡Qué buena idea! 🎁 Tenemos tarjetas regalo para cualquier servicio. Puedes comprarlas en Booksy en un minuto.",
-      enlaces: [{ texto: "Comprar en Booksy", href: salon.booksy }],
+      texto: "¡Qué buena idea! 🎁 Puedes comprar online una tarjeta regalo para gastar en lo que quiera, o regalar un servicio concreto con el botón «Regalar» de cada servicio.",
+      enlaces: [{ texto: "Ver tarjetas regalo", href: "/servicios#regalar" }],
     },
   },
   {

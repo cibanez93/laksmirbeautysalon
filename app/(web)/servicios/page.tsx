@@ -1,16 +1,18 @@
-// Página de SERVICIOS: todos los servicios por secciones, sin precios, con buscador.
+// Página de SERVICIOS: tarjetas regalo arriba y todos los servicios por secciones, sin precios, con buscador.
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import BloqueTarjetasRegalo from "@/components/tienda/BloqueTarjetasRegalo";
 import AbrirAsistente from "@/components/web/chat/AbrirAsistente";
 import { TituloSeccion } from "@/components/web/decoracion";
 import { categorias, duracionBonita, nombreBonito } from "@/lib/categorias";
 import { obtenerDestacadosSeguro } from "@/lib/destacados";
 import { listarServiciosActivos } from "@/lib/servicios";
+import { listarTarjetasActivas, type TarjetaRegalo } from "@/lib/tarjetas";
 import ListaServicios, { type GrupoServicios } from "./ListaServicios";
 
 export const metadata: Metadata = {
   title: "Servicios de peluquería y estética en Ripagaina, Pamplona | Laksmir Beauty Salon",
-  description: "Peluquería, tratamientos faciales y corporales, manicura, maquillaje, masajes y diseño de mirada en Ripagaina (Pamplona). Reserva online.",
+  description: "Peluquería, tratamientos faciales y corporales, manicura, maquillaje, masajes y diseño de mirada en Ripagaina (Pamplona). Reserva online o regala una tarjeta regalo.",
 };
 
 async function getGrupos(): Promise<GrupoServicios[] | null> {
@@ -40,8 +42,17 @@ async function getGrupos(): Promise<GrupoServicios[] | null> {
   }
 }
 
+async function getTarjetas(): Promise<TarjetaRegalo[]> {
+  try {
+    return await listarTarjetasActivas();
+  } catch (error) {
+    console.error("Error al traer las tarjetas regalo:", error);
+    return [];
+  }
+}
+
 export default async function ServiciosPage() {
-  const grupos = await getGrupos();
+  const [grupos, tarjetas] = await Promise.all([getGrupos(), getTarjetas()]);
 
   return (
     <div className="px-4 md:px-8 py-16 md:py-20">
@@ -51,6 +62,8 @@ export default async function ServiciosPage() {
           Todo lo que podemos hacer por ti. ¿Dudas sobre qué elegir?{" "}
           <AbrirAsistente className="text-dorado-oscuro underline underline-offset-2 hover:text-neutral-900">Pregunta a nuestra asistente</AbrirAsistente>.
         </p>
+
+        <BloqueTarjetasRegalo tarjetas={tarjetas} />
 
         {grupos ? (
           <ListaServicios grupos={grupos} />

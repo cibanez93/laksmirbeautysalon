@@ -250,10 +250,10 @@ export default async function InicioPage() {
       <section className="px-4 md:px-8 py-20 text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">El regalo perfecto</p>
         <h2 className="font-serif text-3xl md:text-4xl mb-4">Regala un momento Laksmir</h2>
-        <p className="text-neutral-600 max-w-md mx-auto mb-8">Tarjetas regalo para cualquier servicio. Cómpralas en Booksy en un minuto.</p>
-        <a href={salon.booksy} target="_blank" rel="noopener noreferrer" className="inline-block bg-neutral-900 text-white text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado-oscuro transition-colors">
+        <p className="text-neutral-600 max-w-md mx-auto mb-8">Una tarjeta regalo para gastar en lo que quiera, o un servicio concreto. Cómprala online en un minuto.</p>
+        <Link href="/servicios#regalar" className="inline-block bg-neutral-900 text-white text-sm uppercase tracking-widest px-8 py-4 hover:bg-dorado-oscuro transition-colors">
           Comprar tarjeta regalo
-        </a>
+        </Link>
       </section>
     </>
   );

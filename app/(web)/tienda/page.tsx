@@ -1,20 +1,17 @@
-// Página de TIENDA: tarjetas regalo y productos.
-// Los bonos de servicios concretos se compran desde las páginas de servicios (botón "Regalar").
-// Los productos y los bonos se gestionan en el panel. El pago todavía no funciona.
-// Es la única parte de la web con precios (obligatorio para vender).
+// Página de TIENDA: solo los productos de belleza que se venden en el salón.
+// Las tarjetas regalo y los bonos de servicios están en la página de Servicios; los cursos, en Academia.
+// Los productos se gestionan en el panel. Junto con Servicios y Academia, es donde se ven precios (obligatorio para vender).
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import BotonAnadir from "@/components/tienda/BotonAnadir";
-import TarjetaVisual from "@/components/tienda/TarjetaVisual";
 import { Adorno, FotoDestacada, FotoPendiente, TituloSeccion } from "@/components/web/decoracion";
 import { listarProductosActivos, type Producto } from "@/lib/productos";
-import { listarTarjetasActivas, type TarjetaRegalo } from "@/lib/tarjetas";
-import { euros, MESES_CADUCIDAD, productosEjemplo } from "@/lib/tienda";
+import { euros, productosEjemplo } from "@/lib/tienda";
 
 export const metadata: Metadata = {
-  title: "Tienda y tarjetas regalo | Laksmir Beauty Salon, Ripagaina",
-  description: "Regala belleza: bonos regalo de servicios, tarjetas regalo y productos profesionales de Laksmir Beauty Salon en Ripagaina (Pamplona).",
+  title: "Tienda de productos de belleza | Laksmir Beauty Salon, Ripagaina",
+  description: "Los productos profesionales de cabello, piel y uñas que usamos en Laksmir Beauty Salon. Recógelos en el salón de Ripagaina (Pamplona) o te los enviamos a casa.",
 };
 
 async function getProductos(): Promise<Producto[]> {
@@ -26,97 +23,28 @@ async function getProductos(): Promise<Producto[]> {
   }
 }
 
-async function getTarjetas(): Promise<TarjetaRegalo[]> {
-  try {
-    return await listarTarjetasActivas();
-  } catch (error) {
-    console.error("Error al traer las tarjetas regalo:", error);
-    return [];
-  }
-}
-
-const pasos = [
-  { titulo: "Elige tu regalo", texto: "Un servicio concreto o una tarjeta con el importe que quieras." },
-  { titulo: "Recíbelo por email", texto: "Te llega al momento un bono con un código único, listo para regalar." },
-  { titulo: "Reserva la cita", texto: `Quien lo recibe reserva cuando quiera. Válido durante ${MESES_CADUCIDAD === 12 ? "1 año" : `${MESES_CADUCIDAD} meses`}.` },
-];
-
 export default async function TiendaPage() {
   await connection();
-  const [productos, tarjetas] = await Promise.all([getProductos(), getTarjetas()]);
+  const productos = await getProductos();
 
   return (
     <>
       {/* Portada */}
-      <section className="bg-neutral-900 text-white px-4 md:px-8 py-16 md:py-24 text-center">
+      <section className="bg-neutral-900 text-white px-4 md:px-8 py-16 md:py-20 text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-dorado mb-4">Tienda online</p>
-        <h1 className="font-serif text-4xl md:text-6xl mb-6">Regala un momento Laksmir</h1>
-        <p className="text-neutral-300 text-lg max-w-xl mx-auto mb-10">Tarjetas regalo, bonos para cualquiera de nuestros servicios y los productos profesionales que usamos en el salón.</p>
-        <nav aria-label="Secciones de la tienda" className="flex flex-wrap justify-center gap-3">
-          {[
-            { texto: "Tarjetas regalo", href: "#tarjetas" },
-            { texto: "Regalar un servicio", href: "#regalar-servicio" },
-            { texto: "Productos", href: "#productos" },
-          ].map((s) => (
-            <a key={s.href} href={s.href} className="border border-dorado text-dorado text-xs uppercase tracking-widest px-6 py-3 hover:bg-dorado hover:text-neutral-900 transition-colors">
-              {s.texto}
-            </a>
-          ))}
-        </nav>
-      </section>
-
-      {/* Cómo funciona */}
-      <section className="px-4 md:px-8 py-14 bg-arena">
-        <ol className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
-          {pasos.map((p, i) => (
-            <li key={p.titulo}>
-              <p className="font-serif text-4xl text-dorado mb-2">0{i + 1}</p>
-              <h2 className="font-serif text-xl mb-1">{p.titulo}</h2>
-              <p className="text-sm text-neutral-600">{p.texto}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Tarjetas regalo */}
-      <section id="tarjetas" className="scroll-mt-24 px-4 md:px-8 py-20">
-        <div className="max-w-5xl mx-auto">
-          <TituloSeccion antetitulo="Para que elija lo que quiera" titulo="Tarjetas regalo" />
-          {tarjetas.length === 0 ? (
-            <p className="text-center text-neutral-500">Muy pronto podrás comprar tarjetas regalo desde aquí.</p>
-          ) : (
-            <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {tarjetas.map((t) => (
-                <li key={t.id} className="flex flex-col gap-3">
-                  <TarjetaVisual importe={t.importe} fotoId={t.foto_id} nombre={t.nombre} />
-                  <BotonAnadir articulo={{ id: `tarjeta-${t.id}`, tipo: "tarjeta", nombre: `${t.nombre} de ${euros(t.importe)}`, precio: t.importe }} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
-
-      {/* Regalar un servicio: se hace desde las páginas de servicios */}
-      <section id="regalar-servicio" className="scroll-mt-24 bg-white px-4 md:px-8 py-16">
-        <div className="relative max-w-3xl mx-auto text-center border border-linea px-6 py-12">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-2 border border-dorado/30" />
-          <p className="text-xs uppercase tracking-[0.3em] text-dorado-oscuro mb-3">Bonos regalo</p>
-          <h2 className="font-serif text-3xl md:text-4xl mb-4">¿Quieres regalar un servicio concreto?</h2>
-          <p className="text-neutral-600 max-w-lg mx-auto mb-8">
-            Un corte, una limpieza facial, una manicura… Búscalo en nuestros servicios y pulsa <strong className="font-medium text-neutral-900">«Regalar»</strong>.
-          </p>
-          <Link href="/servicios" className="inline-block bg-dorado text-neutral-900 text-sm uppercase tracking-widest px-8 py-4 hover:bg-neutral-900 hover:text-white transition-colors">
-            Ver servicios para regalar
-          </Link>
-        </div>
+        <h1 className="font-serif text-4xl md:text-6xl mb-6">Lo que usamos en el salón</h1>
+        <p className="text-neutral-300 text-lg max-w-xl mx-auto">
+          Productos profesionales para cuidar tu cabello, tu piel y tus uñas en casa. Recógelos en el salón o te los enviamos.
+        </p>
+        <p className="text-sm text-neutral-400 mt-6">
+          ¿Buscas un regalo? Las <Link href="/servicios#regalar" className="text-dorado underline underline-offset-2 hover:text-white">tarjetas regalo</Link> están en Servicios.
+        </p>
       </section>
 
       {/* Productos */}
       <section id="productos" className="scroll-mt-24 px-4 md:px-8 py-20">
         <div className="max-w-6xl mx-auto">
-          <TituloSeccion antetitulo="Lo que usamos en el salón" titulo="Productos" />
-          <p className="text-center text-neutral-600 -mt-4 mb-12">Recógelos en el salón o te los enviamos a casa.</p>
+          <TituloSeccion antetitulo="Cabello, piel y uñas" titulo="Productos" />
           <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {productos.length > 0
               ? productos.map((p) => (
